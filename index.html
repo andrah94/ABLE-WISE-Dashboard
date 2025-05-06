@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABLE & WISE Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"> <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Styles exactly as provided by the user in the previous turn */
+        :root {
+            --main-bg: #18181B; /* Updated: Softer dark (zinc-900) */
+            --main-text: #FFFFFF;
+            --able-bg: #000000;
+            --able-accent: #C0C0C0;
+            --able-text-on-black: #FFFFFF;
+            --able-text-on-silver: #1A1A1A; /* Charcoal */
+            --wise-bg: #111111;
+            --wise-accent: #FFD700;
+            --wise-text: #F0F0F0; /* Light gray */
+            --navbar-bg: #1F2937; /* Dark gray navbar */
+            --card-bg-main: #27272A; /* zinc-800 for cards on main view */
+            --column-bg-main: #27272A; /* zinc-800 for columns on main view */
+            --input-bg-main: #3F3F46; /* zinc-700 for inputs on main view */
+            --border-main: #52525B; /* zinc-600 for borders on main view */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-top: 60px; /* Height of fixed navbar */
+            overflow-x: hidden;
+            background-color: var(--main-bg); /* Set default body background */
+        }
+
+        .fixed-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--navbar-bg);
+            color: var(--main-text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .navbar-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-logo-container img {
+            height: 30px;
+            width: auto;
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+         .navbar-logo-container img.active-logo {
+            display: inline-block; 
+            opacity: 1;
+        }
+         .navbar-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .nav-toggle-buttons button {
+            background-color: transparent;
+            color: var(--main-text);
+            border: 1px solid transparent;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        .nav-toggle-buttons button.active,
+        .nav-toggle-buttons button:hover {
+            background-color: #4F46E5; 
+            border-color: #4F46E5;
+            color: var(--main-text);
+        }
+
+        .admin-icon .fa-user-shield {
+            font-size: 1.5rem;
+            color: var(--main-text);
+        }
+
+        .page-container {
+            display: none; 
+            min-height: calc(100vh - 60px);
+            padding: 20px;
+            animation-duration: 0.5s;
+            animation-fill-mode: forwards;
+            position: absolute; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .page-container.active {
+            display: block;
+            animation-name: fadeIn;
+        }
+
+        .page-container.slide-in-from-right { animation-name: slideInFromRight; }
+        .page-container.slide-in-from-left { animation-name: slideInFromLeft; }
+        .page-container.slide-out-to-left { animation-name: slideOutToLeft; animation-fill-mode: forwards; }
+        .page-container.slide-out-to-right { animation-name: slideOutToRight; animation-fill-mode: forwards; }
+
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInFromRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideInFromLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutToLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+        @keyframes slideOutToRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        #mainView { background-color: var(--main-bg); color: var(--main-text); }
+        .daily-planner { display: flex; overflow-x: auto; padding-bottom: 15px; gap: 10px; }
+        .planner-day-column {
+            min-width: 250px; max-width: 300px; background-color: var(--column-bg-main);
+            border-radius: 8px; padding: 10px; height: 450px; overflow-y: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .planner-day-column h3 {
+            border-bottom: 1px solid var(--border-main); padding-bottom: 8px; margin-bottom: 10px;
+            font-size: 0.95rem; color: #A1A1AA; text-align: center;
+        }
+        .task-card {
+            padding: 10px; border-radius: 6px; margin-bottom: 8px; cursor: grab;
+            border-left: 4px solid transparent; transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+        .task-card:hover { box-shadow: 0 0 10px rgba(79, 70, 229, 0.3); transform: translateY(-1px); }
+        #mainView .task-card { background-color: var(--card-bg-main); }
+        #mainView .task-card.able-tag { border-left-color: var(--able-accent); }
+        #mainView .task-card.wise-tag { border-left-color: var(--wise-accent); }
+        .task-card p { margin: 2px 0; font-size: 0.9em; }
+        .task-card .task-title { font-weight: 600; color: var(--main-text); }
+        .task-card .task-meta { font-size: 0.8em; color: #A1A1AA; }
+
+        .master-task-list table { width: 100%; border-collapse: collapse; }
+        .master-task-list th, .master-task-list td { padding: 10px 8px; border: 1px solid var(--border-main); text-align: left; font-size: 0.9rem;}
+        .master-task-list th { background-color: var(--column-bg-main); cursor: pointer; color: #D4D4D8; }
+        .master-task-list th:hover { background-color: #3F3F46; }
+        .master-task-list input[type="text"], .master-task-list select {
+            background-color: var(--input-bg-main); color: var(--main-text);
+            border: 1px solid var(--border-main); padding: 8px; border-radius: 4px;
+        }
+        .view-toggle-buttons button { background-color: var(--input-bg-main); margin-right: 5px; color: #D4D4D8; }
+        .view-toggle-buttons button.active { background-color: #4F46E5; color: var(--main-text); }
+
+        .calendar-grid-view { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background-color: var(--column-bg-main); padding:10px; border-radius: 8px; }
+        .calendar-day-cell { min-height: 100px; background-color: var(--card-bg-main); padding: 5px; border-radius: 4px; font-size: 0.8em; border: 1px solid var(--border-main); }
+        .calendar-day-cell .day-number { font-weight: bold; margin-bottom: 5px; color: #D4D4D8; }
+        .calendar-task-item { background-color: #3F3F46; color: var(--main-text); padding: 2px 4px; border-radius: 3px; font-size:0.9em; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+        .calendar-task-item.able-tag { border-left: 2px solid var(--able-accent); padding-left: 5px; }
+        .calendar-task-item.wise-tag { border-left: 2px solid var(--wise-accent); padding-left: 5px; }
+
+        .timeline-gantt-view { background-color: var(--column-bg-main); padding:10px; border-radius: 8px; overflow-x: auto; }
+        .timeline-row { display: flex; align-items: center; margin-bottom: 5px; border-bottom: 1px solid var(--border-main); padding-bottom: 5px; }
+        .timeline-task-name { width: 150px; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px; color: #D4D4D8; }
+        .timeline-bar-container { flex-grow: 1; height: 20px; position: relative; background-color: var(--card-bg-main); border-radius: 3px; }
+        .timeline-bar { position: absolute; height: 100%; background-color: #4F46E5; border-radius: 3px; opacity: 0.7; }
+        .timeline-bar.able-tag { background-color: var(--able-accent); }
+        .timeline-bar.wise-tag { background-color: var(--wise-accent); }
+
+        #ableView { background-color: var(--able-bg); color: var(--able-text-on-black); font-family: 'Lora', serif; }
+        #ableView .section-header { color: var(--able-accent); border-bottom: 1px solid var(--able-accent); padding-bottom: 5px; margin-bottom: 15px; position: relative; }
+        #ableView .section-header::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 0; height: 1px; background-color: var(--able-accent); transition: width 0.5s ease-in-out; }
+        #ableView .section-header.animate-line::after { width: 100px; }
+        #ableView .kanban-board { display: flex; flex-wrap: wrap; gap: 15px; }
+        #ableView .kanban-column { background-color: #1A1A1A; color: var(--able-text-on-black); border: 1px solid var(--able-accent); border-radius: 8px; padding: 10px; flex: 1 1 300px; min-height: 300px; }
+        #ableView .kanban-column h3 { color: var(--able-accent); border-bottom: 1px solid var(--able-accent); text-align: center; padding-bottom: 5px; margin-bottom: 10px;}
+        #ableView .task-card { background-color: #222; border-left-color: var(--able-accent); }
+        #ableView input, #ableView textarea, #ableView select, #ableView button { background-color: #1A1A1A; color: var(--able-text-on-black); border: 1px solid var(--able-accent); border-radius: 4px; padding: 8px; }
+        #ableView button { background-color: var(--able-accent); color: var(--able-text-on-silver); font-weight: bold; }
+        #ableView button:hover { filter: brightness(1.2); }
+        #ableView .filter-panel { background-color: #101010; border: 1px solid var(--able-accent); padding: 10px; border-radius: 5px; margin-bottom: 15px;}
+        #ableView .filter-panel input { width: calc(50% - 10px); margin-right:10px; }
+
+        #wiseView { background-color: var(--wise-bg); color: var(--wise-text); font-family: 'Roboto', sans-serif; }
+        #wiseView .section-header { color: var(--wise-accent); border-bottom: 1px solid var(--wise-accent); padding-bottom: 5px; margin-bottom: 15px; font-weight: bold; }
+        #wiseView .kanban-board { display: flex; flex-wrap: wrap; gap: 15px; }
+        #wiseView .kanban-column { background-color: #1C1C1C; border: 1px solid #333; border-top: 2px solid var(--wise-accent); border-radius: 8px; padding: 10px; flex: 1 1 280px; min-height: 300px; }
+        #wiseView .kanban-column h3 { color: var(--wise-accent); border-bottom: 1px solid #333; text-align: center; padding-bottom: 5px; margin-bottom: 10px;}
+        #wiseView .task-card { background-color: #282828; border-left-color: var(--wise-accent); }
+        #wiseView input, #wiseView textarea, #wiseView select, #wiseView button { background-color: #282828; color: var(--wise-text); border: 1px solid #444; border-radius: 4px; padding: 8px; font-weight: 500; }
+        #wiseView button { background-color: var(--wise-accent); color: var(--wise-bg); font-weight: bold; transition: transform 0.2s, box-shadow 0.2s; }
+        #wiseView button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); filter: brightness(1.1); }
+        /* Updated: Standardize section backgrounds for WISE */
+        #wiseView .form-section, #wiseView .quick-notes-panel, #wiseView .workflow-trigger-form { background-color: #1C1C1C; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333;}
+        #wiseView .quick-notes-panel textarea { width: 100%; min-height: 100px; }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: #1F2937; color: #F0F0F0; padding: 20px; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-header h2 { margin: 0; }
+        .close-button { font-size: 1.5rem; cursor: pointer; color: #aaa; }
+        .close-button:hover { color: #fff; }
+        .modal input, .modal textarea, .modal select, .modal button { background-color: #2C2C2C; color: #F0F0F0; border: 1px solid #444; border-radius: 4px; padding: 10px; margin-bottom:10px; width:100%; }
+        .modal button.primary { background-color: #4F46E5; }
+        .modal button.primary:hover { background-color: #4338CA; }
+
+        .task-card.dragging { opacity: 0.5; border: 2px dashed #fff; transform: scale(1.05); }
+        .drop-target-hover { background-color: rgba(79, 70, 229, 0.1) !important; border: 1px dashed #4F46E5; }
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #2c2c2c; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; border: 2px solid #2c2c2c; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed-navbar">
+        <div class="navbar-logo-container">
+            <img id="navbarLogoAble" src="https://static.wixstatic.com/media/5e8141_0a6dcd8218ea4c8eb7cd62eaecbe75ba~mv2.png" alt="ABLE Logo" class="active-logo">
+            <img id="navbarLogoWise" src="https://static.wixstatic.com/media/5e8141_24f1e1c816bd46b7987e446519833fa7~mv2.jpg" alt="WISE Logo">
+            <span class="navbar-title">ABLE & WISE</span>
+        </div>
+        <div class="nav-toggle-buttons">
+            <button data-view="mainView" class="active">Main View</button>
+            <button data-view="ableView">ABLE Foundation</button>
+            <button data-view="wiseView">WISE Financial</button>
+        </div>
+        <div class="admin-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+    </nav>
+
+    <section id="mainView" class="page-container active">
+        <h2 class="text-2xl font-bold mb-1 text-zinc-300">Aggregated Dashboard</h2>
+        <p class="text-sm text-zinc-400 mb-6">Overview of all tasks and daily planning. Task creation is managed within specific ABLE or WISE views.</p>
+        <h3 class="text-xl font-semibold mt-6 mb-3 text-zinc-300">Daily Planner</h3>
+        <div id="dailyPlanner" class="daily-planner"></div>
+        <div class="mt-8 mb-4 flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-zinc-300">All Tasks</h3>
+            <div class="view-toggle-buttons">
+                <button data-task-view="list" class="active p-2 rounded">List</button>
+                <button data-task-view="calendar" class="p-2 rounded">Calendar</button>
+                <button data-task-view="timeline" class="p-2 rounded">Timeline</button>
+            </div>
+        </div>
+        <div id="mainTaskListView" class="main-task-view-content">
+            <div class="master-task-list-filters mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input type="text" id="filterMasterTaskName" placeholder="Filter by name..." class="p-2 rounded">
+                <select id="filterMasterTaskOrg" class="p-2 rounded">
+                    <option value="">All Organizations</option>
+                    <option value="able">ABLE</option>
+                    <option value="wise">WISE</option>
+                    <option value="main">Main/Unassigned</option>
+                </select>
+                <input type="text" id="filterMasterTaskAssignee" placeholder="Filter by assignee..." class="p-2 rounded">
+            </div>
+            <div class="overflow-x-auto"><table id="masterTaskTable" class="master-task-list w-full"><thead><tr><th data-sort="title">Task Name</th><th data-sort="organization">Organization</th><th data-sort="dueDate">Due Date</th><th data-sort="assignee">Assignee</th><th data-sort="status">Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div id="mainCalendarView" class="main-task-view-content hidden">
+            <h4 class="text-lg font-semibold mb-2 text-zinc-300">Calendar <span id="calendarMonthYear"></span></h4>
+            <div class="flex justify-between items-center mb-2"><button id="prevMonthBtn" class="p-1 bg-zinc-700 hover:bg-zinc-600 rounded text-zinc-300">&lt; Prev</button><button id="nextMonthBtn" class="p-1 bg-zinc-700 hover:bg-zinc-600 rounded text-zinc-300">Next &gt;</button></div>
+            <div id="mainCalendarGrid" class="calendar-grid-view"></div>
+        </div>
+        <div id="mainTimelineView" class="main-task-view-content hidden">
+             <h4 class="text-lg font-semibold mb-2 text-zinc-300">Timeline (Next 30 Days)</h4>
+             <div id="mainTimelineContainer" class="timeline-gantt-view"></div>
+        </div>
+    </section>
+
+    <section id="ableView" class="page-container">
+        <div class="flex items-center justify-between mb-6"><img src="https://static.wixstatic.com/media/5e8141_0a6dcd8218ea4c8eb7cd62eaecbe75ba~mv2.png" alt="ABLE Foundation Logo" class="h-12"><h2 class="text-3xl font-semibold" style="color: var(--able-accent);">ABLE Foundation Dashboard</h2></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1 space-y-6">
+                <div class="p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--able-accent);">
+                    <h3 class="section-header text-xl font-semibold animate-line">Add New Task</h3>
+                    <div class="space-y-3 mt-3">
+                        <div><label for="ableTaskTitle" class="block text-sm font-medium">Title</label><input type="text" id="ableTaskTitle" class="w-full mt-1"></div>
+                        <div><label for="ableTaskDueDate" class="block text-sm font-medium">Due Date</label><input type="date" id="ableTaskDueDate" class="w-full mt-1"></div>
+                        <div><label for="ableTaskAssignee" class="block text-sm font-medium">Assignee</label><input type="text" id="ableTaskAssignee" class="w-full mt-1"></div>
+                        <div><label for="ableTaskNotes" class="block text-sm font-medium">Notes</label><textarea id="ableTaskNotes" rows="3" class="w-full mt-1"></textarea></div>
+                        <div><label for="ableTaskRecurring" class="block text-sm font-medium">Recurring</label><select id="ableTaskRecurring" class="w-full mt-1"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
+                        <button id="ableAddTaskButton" class="w-full">Add ABLE Task</button>
+                    </div>
+                </div>
+                <div class="filter-panel">
+                    <h3 class="section-header text-lg font-semibold animate-line">Filter & Search</h3>
+                     <input type="text" id="ableSearchInput" placeholder="Search tasks..." class="w-full my-2">
+                     <div class="grid grid-cols-2 gap-2"><input type="text" id="ableFilterAssignee" placeholder="Filter Assignee..."><input type="date" id="ableFilterDueDate"></div>
+                </div>
+                 <button id="ableOpenWorkflowBuilder" class="w-full">Build Custom Workflow</button>
+            </div>
+            <div class="md:col-span-2">
+                <h3 class="section-header text-2xl font-semibold animate-line">Task Board</h3>
+                <div id="ableKanbanBoard" class="kanban-board mt-3">
+                    <div class="kanban-column" data-status="todo"><h3>To Do</h3><div class="task-list min-h-[200px]"></div></div>
+                    <div class="kanban-column" data-status="inprogress"><h3>In Progress</h3><div class="task-list min-h-[200px]"></div></div>
+                    <div class="kanban-column" data-status="completed"><h3>Completed</h3><div class="task-list min-h-[200px]"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="wiseView" class="page-container">
+        <div class="flex items-center justify-between mb-6">
+             <img src="https://static.wixstatic.com/media/5e8141_24f1e1c816bd46b7987e446519833fa7~mv2.jpg" alt="WISE Financial Partners Logo" class="h-12">
+            <h2 class="text-3xl font-bold" style="color: var(--wise-accent);">WISE Financial Partners Dashboard</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1 space-y-6">
+                <div class="form-section p-4 rounded-lg">
+                    <h3 class="section-header text-xl font-semibold">Add New WISE Task</h3>
+                    <div class="space-y-3 mt-3">
+                        <div><label for="wiseTaskTitle" class="block text-sm font-medium">Title</label><input type="text" id="wiseTaskTitle" class="w-full mt-1"></div>
+                        <div><label for="wiseTaskDueDate" class="block text-sm font-medium">Due Date</label><input type="date" id="wiseTaskDueDate" class="w-full mt-1"></div>
+                        <div><label for="wiseTaskAssignee" class="block text-sm font-medium">Assignee</label><input type="text" id="wiseTaskAssignee" class="w-full mt-1"></div>
+                        <div><label for="wiseTaskNotes" class="block text-sm font-medium">Notes</label><textarea id="wiseTaskNotes" rows="3" class="w-full mt-1"></textarea></div>
+                        <div><label for="wiseTaskRecurringNew" class="block text-sm font-medium">Recurring</label><select id="wiseTaskRecurringNew" class="w-full mt-1"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
+                        <button id="wiseAddTaskButton" class="w-full">Add WISE Task</button>
+                    </div>
+                </div>
+
+                <div class="workflow-trigger-form">
+                    <h3 class="section-header text-xl font-semibold">Trigger Workflow</h3>
+                    <div class="space-y-3 mt-3">
+                        <div><label for="wiseWorkflowName" class="block text-sm font-medium">Name</label><input type="text" id="wiseWorkflowName" class="w-full mt-1"></div>
+                        <div><label for="wiseWorkflowEmail" class="block text-sm font-medium">Email</label><input type="email" id="wiseWorkflowEmail" class="w-full mt-1"></div>
+                        <div><label for="wiseWorkflowRole" class="block text-sm font-medium">Role Type</label><select id="wiseWorkflowRole" class="w-full mt-1"><option value="partner">Business Partner</option><option value="licensed">Newly Licensed</option><option value="client_onboarding">Client Onboarding</option></select></div>
+                        <button id="wiseTriggerWorkflowButton" class="w-full">Start WISE Workflow</button>
+                    </div>
+                </div>
+                <button id="wiseOpenWorkflowBuilder" class="w-full">Build Custom WISE Workflow</button>
+
+                <div class="quick-notes-panel">
+                     <h3 class="section-header text-xl font-semibold">Quick Notes</h3>
+                     <textarea id="wiseQuickNotesArea" placeholder="Jot down unstructured tasks or reminders..." class="w-full mt-1" rows="5"></textarea>
+                     <button id="wiseAddQuickNoteButton" class="w-full mt-2">Add Note</button>
+                     <div id="wiseQuickNotesList" class="mt-3 space-y-2 text-sm"></div>
+                </div>
+                 <div class="form-section"> {/* Added form-section class for consistency */}
+                    <label for="wiseTaskRecurring" class="block text-sm font-medium">Manage Recurring Tasks (Placeholder)</label>
+                    <select id="wiseTaskRecurring" class="w-full mt-1"><option value="none">None</option><option value="weekly_report">Weekly Client Report</option><option value="monthly_review">Monthly Portfolio Review</option></select>
+                 </div>
+            </div>
+            <div class="md:col-span-2">
+                <h3 class="section-header text-2xl font-semibold">Task Board</h3>
+                <div id="wiseKanbanBoard" class="kanban-board mt-3">
+                    <div class="kanban-column" data-status="inbox"><h3>Inbox</h3><div class="task-list min-h-[200px]"></div></div>
+                    <div class="kanban-column" data-status="assigned"><h3>Assigned</h3><div class="task-list min-h-[200px]"></div></div>
+                    <div class="kanban-column" data-status="inprogress"><h3>In Progress</h3><div class="task-list min-h-[200px]"></div></div>
+                    <div class="kanban-column" data-status="complete"><h3>Complete</h3><div class="task-list min-h-[200px]"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="genericModal" class="modal">
+        <div class="modal-content"><div class="modal-header"><h2 id="modalTitle">Modal Title</h2><span class="close-button" onclick="closeModal('genericModal')">&times;</span></div><div id="modalBody" class="mt-4"><p>This is generic modal content.</p></div><div id="modalFooter" class="mt-6 text-right"><button class="primary" onclick="closeModal('genericModal')">Close</button></div></div>
+    </div>
+
+    <div id="ableWorkflowModal" class="modal">
+        <div class="modal-content" style="background-color: var(--able-bg); border: 1px solid var(--able-accent);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--able-accent);"><h2 id="ableWorkflowModalTitle" style="color: var(--able-accent);">Build ABLE Workflow</h2><span class="close-button" onclick="closeModal('ableWorkflowModal')" style="color: var(--able-accent);">&times;</span></div>
+            <div id="ableWorkflowModalBody" class="mt-4"><div><label for="ableWorkflowName" class="block text-sm font-medium" style="color:var(--able-text-on-black);">Workflow Name</label><input type="text" id="ableWorkflowName" class="w-full mt-1" style="background-color: #1A1A1A; color: var(--able-text-on-black); border: 1px solid var(--able-accent);"></div><h4 class="mt-4 mb-2" style="color: var(--able-accent);">Workflow Steps</h4><div id="ableWorkflowStepsContainer" class="space-y-2"></div><button id="addAbleWorkflowStep" class="mt-2" style="background-color: var(--able-accent); color: var(--able-text-on-silver);">Add Step</button></div>
+            <div id="ableWorkflowModalFooter" class="mt-6 text-right"><button class="primary" id="saveAbleWorkflow" style="background-color: var(--able-accent); color: var(--able-text-on-silver);">Save Workflow</button></div>
+        </div>
+    </div>
+
+    <div id="wiseWorkflowModal" class="modal">
+        <div class="modal-content" style="background-color: var(--wise-bg); border: 1px solid var(--wise-accent);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--wise-accent);">
+                <h2 id="wiseWorkflowModalTitle" style="color: var(--wise-accent);">Build WISE Workflow</h2>
+                <span class="close-button" onclick="closeModal('wiseWorkflowModal')" style="color: var(--wise-accent);">&times;</span>
+            </div>
+            <div id="wiseWorkflowModalBody" class="mt-4">
+                <div>
+                    <label for="wiseNewWorkflowName" class="block text-sm font-medium" style="color:var(--wise-text);">Workflow Name</label>
+                    <input type="text" id="wiseNewWorkflowName" class="w-full mt-1" style="background-color: #282828; color: var(--wise-text); border: 1px solid #444;">
+                </div>
+                <h4 class="mt-4 mb-2" style="color: var(--wise-accent);">Workflow Steps</h4>
+                <div id="wiseWorkflowStepsContainer" class="space-y-2">
+                    </div>
+                <button id="addWiseWorkflowStep" class="mt-2" style="background-color: var(--wise-accent); color: var(--wise-bg);">Add Step</button>
+            </div>
+            <div id="wiseWorkflowModalFooter" class="mt-6 text-right">
+                <button class="primary" id="saveWiseWorkflow" style="background-color: var(--wise-accent); color: var(--wise-bg);">Save Workflow</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    // --- UTILITIES ---
+    const Utils = {
+        generateId: () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        getCurrentDate: () => new Date().toISOString().split('T')[0],
+        getDaysArray: (start, count) => { const arr = []; for (let i = 0; i < count; i++) { const date = new Date(start); date.setDate(date.getDate() + i); arr.push(date); } return arr; },
+        formatDate: (date, options = { weekday: 'short', month: 'short', day: 'numeric' }) => { if (!date) return ''; const d = date instanceof Date ? date : new Date(date + 'T00:00:00'); if (isNaN(d.getTime())) return 'Invalid Date'; return d.toLocaleDateString(undefined, options); }
+    };
+
+    // --- DATA STORE ---
+    let AppData = {
+        mainTasks: [], ableTasks: [], wiseTasks: [],
+        ableWorkflows: [], wiseWorkflows: [], // Changed from ableWorkflows to wiseWorkflows for WISE specific
+        wiseQuickNotes: [],
+        currentSort: { column: 'dueDate', order: 'asc' },
+        mainCalendar: { currentDate: new Date() }
+    };
+
+    // --- DOM ELEMENTS ---
+    const DOM = {
+        navButtons: document.querySelectorAll('.nav-toggle-buttons button'),
+        pageContainers: document.querySelectorAll('.page-container'),
+        dailyPlanner: document.getElementById('dailyPlanner'),
+        masterTaskTableBody: document.querySelector('#masterTaskTable tbody'),
+        masterTaskTableHeaders: document.querySelectorAll('#masterTaskTable th[data-sort]'),
+        filterMasterTaskName: document.getElementById('filterMasterTaskName'),
+        filterMasterTaskOrg: document.getElementById('filterMasterTaskOrg'),
+        filterMasterTaskAssignee: document.getElementById('filterMasterTaskAssignee'),
+        mainTaskViewToggles: document.querySelectorAll('#mainView .view-toggle-buttons button'),
+        mainTaskListView: document.getElementById('mainTaskListView'),
+        mainCalendarView: document.getElementById('mainCalendarView'),
+        mainTimelineView: document.getElementById('mainTimelineView'),
+        mainCalendarGrid: document.getElementById('mainCalendarGrid'),
+        mainTimelineContainer: document.getElementById('mainTimelineContainer'),
+        calendarMonthYear: document.getElementById('calendarMonthYear'),
+        prevMonthBtn: document.getElementById('prevMonthBtn'),
+        nextMonthBtn: document.getElementById('nextMonthBtn'),
+        ableTaskTitle: document.getElementById('ableTaskTitle'),
+        ableTaskDueDate: document.getElementById('ableTaskDueDate'),
+        ableTaskAssignee: document.getElementById('ableTaskAssignee'),
+        ableTaskNotes: document.getElementById('ableTaskNotes'),
+        ableTaskRecurring: document.getElementById('ableTaskRecurring'),
+        ableAddTaskButton: document.getElementById('ableAddTaskButton'),
+        ableKanbanBoard: document.getElementById('ableKanbanBoard'),
+        ableOpenWorkflowBuilder: document.getElementById('ableOpenWorkflowBuilder'),
+        ableWorkflowModal: document.getElementById('ableWorkflowModal'),
+        ableWorkflowName: document.getElementById('ableWorkflowName'), // For creating ABLE workflow
+        ableWorkflowStepsContainer: document.getElementById('ableWorkflowStepsContainer'),
+        addAbleWorkflowStepBtn: document.getElementById('addAbleWorkflowStep'),
+        saveAbleWorkflowBtn: document.getElementById('saveAbleWorkflow'),
+        ableSearchInput: document.getElementById('ableSearchInput'),
+        ableFilterAssignee: document.getElementById('ableFilterAssignee'),
+        ableFilterDueDate: document.getElementById('ableFilterDueDate'),
+        // WISE View Task Creation
+        wiseTaskTitle: document.getElementById('wiseTaskTitle'),
+        wiseTaskDueDate: document.getElementById('wiseTaskDueDate'),
+        wiseTaskAssignee: document.getElementById('wiseTaskAssignee'),
+        wiseTaskNotes: document.getElementById('wiseTaskNotes'),
+        wiseTaskRecurringNew: document.getElementById('wiseTaskRecurringNew'), // New ID for WISE task recurring
+        wiseAddTaskButton: document.getElementById('wiseAddTaskButton'),
+        // WISE Workflow Trigger
+        wiseWorkflowNameInput: document.getElementById('wiseWorkflowName'), // For triggering, not creating
+        wiseWorkflowEmailInput: document.getElementById('wiseWorkflowEmail'),
+        wiseWorkflowRoleSelect: document.getElementById('wiseWorkflowRole'),
+        wiseTriggerWorkflowButton: document.getElementById('wiseTriggerWorkflowButton'),
+        // WISE Workflow Builder
+        wiseOpenWorkflowBuilder: document.getElementById('wiseOpenWorkflowBuilder'),
+        wiseWorkflowModal: document.getElementById('wiseWorkflowModal'),
+        wiseNewWorkflowName: document.getElementById('wiseNewWorkflowName'), // For creating WISE workflow
+        wiseWorkflowStepsContainer: document.getElementById('wiseWorkflowStepsContainer'),
+        addWiseWorkflowStepBtn: document.getElementById('addWiseWorkflowStep'),
+        saveWiseWorkflowBtn: document.getElementById('saveWiseWorkflow'),
+        // WISE Others
+        wiseKanbanBoard: document.getElementById('wiseKanbanBoard'),
+        wiseQuickNotesArea: document.getElementById('wiseQuickNotesArea'),
+        wiseAddQuickNoteButton: document.getElementById('wiseAddQuickNoteButton'),
+        wiseQuickNotesList: document.getElementById('wiseQuickNotesList'),
+        genericModal: document.getElementById('genericModal'),
+        modalTitle: document.getElementById('modalTitle'),
+        modalBody: document.getElementById('modalBody'),
+        modalFooter: document.getElementById('modalFooter'),
+        navbarLogoAble: document.getElementById('navbarLogoAble'),
+        navbarLogoWise: document.getElementById('navbarLogoWise')
+    };
+
+    // --- UI & VIEW MANAGEMENT ---
+    let currentPage = 'mainView';
+    let previousPage = null;
+    function switchView(targetViewId) { /* ... (code unchanged) ... */
+        if (targetViewId === currentPage) return;
+        previousPage = currentPage;
+        currentPage = targetViewId;
+        DOM.pageContainers.forEach(container => {
+            const isTarget = container.id === targetViewId;
+            const isPrevious = container.id === previousPage;
+            container.classList.remove('active', 'slide-in-from-left', 'slide-in-from-right', 'slide-out-to-left', 'slide-out-to-right');
+            if (isTarget) {
+                container.classList.add('active');
+                const targetIndex = Array.from(DOM.navButtons).findIndex(btn => btn.dataset.view === targetViewId);
+                const prevIndex = Array.from(DOM.navButtons).findIndex(btn => btn.dataset.view === previousPage);
+                if (previousPage && targetIndex > prevIndex) container.classList.add('slide-in-from-right');
+                else if (previousPage) container.classList.add('slide-in-from-left');
+                else container.style.animationName = 'fadeIn';
+            } else if (isPrevious) {
+                const targetIndex = Array.from(DOM.navButtons).findIndex(btn => btn.dataset.view === targetViewId);
+                const prevIndex = Array.from(DOM.navButtons).findIndex(btn => btn.dataset.view === previousPage);
+                if (targetIndex > prevIndex) container.classList.add('slide-out-to-left');
+                else container.classList.add('slide-out-to-right');
+                container.addEventListener('animationend', () => { if (container.id === previousPage) container.classList.remove('active'); }, { once: true });
+            }
+        });
+        DOM.navButtons.forEach(button => button.classList.toggle('active', button.dataset.view === targetViewId));
+        if (targetViewId === 'ableView') { document.querySelectorAll('#ableView .section-header').forEach(header => { setTimeout(() => header.classList.add('animate-line'), 50); setTimeout(() => header.classList.remove('animate-line'), 1000); }); }
+    }
+
+    // --- MODAL MANAGEMENT ---
+    function openModal(modalId, title = "Details", bodyContent = "", footerContent = "") { /* ... (code unchanged) ... */
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        if (modalId === 'genericModal') { DOM.modalTitle.textContent = title; DOM.modalBody.innerHTML = bodyContent; DOM.modalFooter.innerHTML = footerContent || `<button class="primary" onclick="closeModal('${modalId}')">Close</button>`; }
+        modal.classList.add('active');
+    }
+    function closeModal(modalId) { /* ... (code unchanged) ... */
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('active');
+    }
+
+    // --- TASK CARD CREATION ---
+    function createTaskCardElement(task, viewType = 'main') { /* ... (code unchanged) ... */
+        const card = document.createElement('div'); card.className = 'task-card'; card.draggable = true; card.dataset.taskId = task.id; card.dataset.taskOrg = task.organization; card.dataset.taskStatus = task.status;
+        let orgClass = ''; let borderColor = '';
+        if (task.organization === 'able') { orgClass = 'able-tag'; borderColor = 'var(--able-accent)'; } else if (task.organization === 'wise') { orgClass = 'wise-tag'; borderColor = 'var(--wise-accent)'; } else { borderColor = '#60A5FA'; }
+        card.classList.add(orgClass); card.style.borderLeft = `4px solid ${borderColor}`;
+        if (currentPage === 'mainView') card.style.backgroundColor = 'var(--card-bg-main)'; else if (currentPage === 'ableView') card.style.backgroundColor = '#222'; else if (currentPage === 'wiseView') card.style.backgroundColor = '#282828';
+        card.innerHTML = `<p class="task-title">${task.title}</p><p class="task-meta">Due: ${Utils.formatDate(task.dueDate, { month: 'short', day: 'numeric' })}</p>${task.assignee ? `<p class="task-meta">To: ${task.assignee}</p>` : ''}${viewType !== 'planner' ? `<p class="task-meta capitalize">Status: ${task.status || 'N/A'}</p>` : ''}`;
+        card.addEventListener('dragstart', handleDragStart); return card;
+    }
+
+    // --- DRAG AND DROP ---
+    let draggedItem = null;
+    function handleDragStart(e) { /* ... (code unchanged) ... */
+        draggedItem = e.target; e.dataTransfer.setData('text/plain', draggedItem.dataset.taskId); setTimeout(() => { draggedItem.classList.add('dragging'); }, 0);
+    }
+    function setupDragAndDropListeners(containerSelector, columnSelector, taskListSelector) { /* ... (code unchanged) ... */
+        const columns = document.querySelectorAll(`${containerSelector} ${columnSelector}`); columns.forEach(column => { column.addEventListener('dragover', handleDragOver); column.addEventListener('dragenter', handleDragEnter); column.addEventListener('dragleave', handleDragLeave); column.addEventListener('drop', (e) => handleDrop(e, taskListSelector)); }); document.addEventListener('dragend', () => { if (draggedItem) { draggedItem.classList.remove('dragging'); draggedItem = null; } document.querySelectorAll('.drop-target-hover').forEach(el => el.classList.remove('drop-target-hover')); });
+    }
+    function handleDragOver(e) { e.preventDefault(); }
+    function handleDragEnter(e) { e.preventDefault(); const dt = e.target.closest('.kanban-column, .planner-day-column'); if (dt) dt.classList.add('drop-target-hover'); }
+    function handleDragLeave(e) { const dt = e.target.closest('.kanban-column, .planner-day-column'); if (dt) dt.classList.remove('drop-target-hover'); }
+    function handleDrop(e, taskListSelector) { /* ... (code unchanged) ... */
+        e.preventDefault(); if (!draggedItem) return; const targetColumn = e.target.closest('.kanban-column, .planner-day-column'); if (!targetColumn) return; targetColumn.classList.remove('drop-target-hover'); const taskList = targetColumn.querySelector(taskListSelector || '.task-list'); if (!taskList) { console.error("Task list container not found"); return; } const taskId = draggedItem.dataset.taskId; const newStatus = targetColumn.dataset.status; const newDate = targetColumn.dataset.date; let taskToUpdate, taskSourceArray; if (AppData.ableTasks.find(t => t.id === taskId)) taskSourceArray = AppData.ableTasks; else if (AppData.wiseTasks.find(t => t.id === taskId)) taskSourceArray = AppData.wiseTasks; else if (AppData.mainTasks.find(t => t.id === taskId)) taskSourceArray = AppData.mainTasks; if (taskSourceArray) taskToUpdate = taskSourceArray.find(t => t.id === taskId); if (taskToUpdate) { if (newStatus && currentPage !== 'mainView') taskToUpdate.status = newStatus; if (newDate && currentPage === 'mainView' && targetColumn.closest('#dailyPlanner')) taskToUpdate.dueDate = newDate; taskList.appendChild(draggedItem); if (currentPage === 'ableView') renderAbleTasks(); else if (currentPage === 'wiseView') renderWiseTasks(); renderMainPlanner(); renderMasterTaskList(); renderMainCalendar(); renderMainTimeline(); } else console.warn("Could not find task to update:", taskId); draggedItem.classList.remove('dragging'); draggedItem = null;
+    }
+
+    // --- MAIN VIEW LOGIC ---
+    function renderMainPlanner() { /* ... (code unchanged) ... */
+        DOM.dailyPlanner.innerHTML = ''; const today = new Date(); const days = Utils.getDaysArray(today, 7); days.forEach(day => { const dayStr = day.toISOString().split('T')[0]; const col = document.createElement('div'); col.className = 'planner-day-column'; col.dataset.date = dayStr; col.dataset.status = 'planned'; col.innerHTML = `<h3 class="text-center font-semibold">${Utils.formatDate(day)}</h3><div class="task-list min-h-[300px] p-1"></div>`; const list = col.querySelector('.task-list'); getAggregatedTasks().filter(t => t.dueDate === dayStr).forEach(task => list.appendChild(createTaskCardElement(task, 'planner'))); DOM.dailyPlanner.appendChild(col); }); setupDragAndDropListeners('#dailyPlanner', '.planner-day-column', '.task-list');
+    }
+    function getAggregatedTasks() { /* ... (code unchanged) ... */
+        const all = [...AppData.mainTasks, ...AppData.ableTasks, ...AppData.wiseTasks]; return Array.from(new Map(all.map(t => [t.id, t])).values());
+    }
+    function renderMasterTaskList() { /* ... (code unchanged) ... */
+        const tbody = DOM.masterTaskTableBody; tbody.innerHTML = ''; let tasks = getAggregatedTasks(); const nameF = DOM.filterMasterTaskName.value.toLowerCase(); const orgF = DOM.filterMasterTaskOrg.value; const assigneeF = DOM.filterMasterTaskAssignee.value.toLowerCase(); if (nameF) tasks = tasks.filter(t => t.title.toLowerCase().includes(nameF)); if (orgF) tasks = tasks.filter(t => t.organization === orgF); if (assigneeF) tasks = tasks.filter(t => t.assignee && t.assignee.toLowerCase().includes(assigneeF)); tasks.sort((a, b) => { let va = a[AppData.currentSort.column] || ''; let vb = b[AppData.currentSort.column] || ''; if (AppData.currentSort.column === 'dueDate') { va = new Date(va || 0); vb = new Date(vb || 0); } if (typeof va === 'string') va = va.toLowerCase(); if (typeof vb === 'string') vb = vb.toLowerCase(); if (va < vb) return AppData.currentSort.order === 'asc' ? -1 : 1; if (va > vb) return AppData.currentSort.order === 'asc' ? 1 : -1; return 0; }); tasks.forEach(task => { const r = tbody.insertRow(); r.innerHTML = `<td>${task.title}</td><td class="capitalize ${task.organization === 'able' ? 'text-zinc-400' : task.organization === 'wise' ? 'text-yellow-400' : 'text-sky-400'}">${task.organization}</td><td>${Utils.formatDate(task.dueDate)}</td><td>${task.assignee || 'N/A'}</td><td class="capitalize">${task.status || 'N/A'}</td><td><button class="text-xs p-1 bg-indigo-600 hover:bg-indigo-700 rounded text-white" onclick="editTaskPrompt('${task.id}', '${task.organization}')">Edit</button></td>`; });
+    }
+    function editTaskPrompt(taskId, taskOrg) { /* ... (code unchanged) ... */
+        let arr; if (taskOrg === 'able') arr = AppData.ableTasks; else if (taskOrg === 'wise') arr = AppData.wiseTasks; else arr = AppData.mainTasks; const task = arr.find(t => t.id === taskId); if (!task) { alert('Task not found!'); return; } const nt = prompt(`Edit title:`, task.title); if (nt !== null && nt.trim() !== "") task.title = nt.trim(); const nd = prompt(`Edit due date (YYYY-MM-DD):`, task.dueDate); if (nd !== null) task.dueDate = nd; const na = prompt(`Edit assignee:`, task.assignee); if (na !== null) task.assignee = na.trim(); renderMasterTaskList(); renderMainPlanner(); if (taskOrg === 'able') renderAbleTasks(); if (taskOrg === 'wise') renderWiseTasks(); renderMainCalendar(); renderMainTimeline();
+    }
+    function sortMasterTable(column) { /* ... (code unchanged) ... */
+        if (AppData.currentSort.column === column) AppData.currentSort.order = AppData.currentSort.order === 'asc' ? 'desc' : 'asc'; else { AppData.currentSort.column = column; AppData.currentSort.order = 'asc'; } DOM.masterTaskTableHeaders.forEach(th => { th.classList.remove('sort-asc', 'sort-desc'); if (th.dataset.sort === AppData.currentSort.column) th.classList.add(AppData.currentSort.order === 'asc' ? 'sort-asc' : 'sort-desc'); }); renderMasterTaskList();
+    }
+    function switchMainTaskView(viewName) { /* ... (code unchanged) ... */
+        DOM.mainTaskListView.classList.toggle('hidden', viewName !== 'list'); DOM.mainCalendarView.classList.toggle('hidden', viewName !== 'calendar'); DOM.mainTimelineView.classList.toggle('hidden', viewName !== 'timeline'); DOM.mainTaskViewToggles.forEach(btn => btn.classList.toggle('active', btn.dataset.taskView === viewName)); if (viewName === 'calendar') renderMainCalendar(); if (viewName === 'timeline') renderMainTimeline();
+    }
+    function renderMainCalendar() { /* ... (code unchanged) ... */
+        DOM.mainCalendarGrid.innerHTML = ''; const cd = AppData.mainCalendar.currentDate; DOM.calendarMonthYear.textContent = cd.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }); const y = cd.getFullYear(), m = cd.getMonth(); const fd = new Date(y, m, 1), ld = new Date(y, m + 1, 0); const days = ld.getDate(), start = fd.getDay(); for (let i = 0; i < start; i++) DOM.mainCalendarGrid.appendChild(document.createElement('div')).className = 'border border-zinc-700'; const allTasks = getAggregatedTasks(); for (let day = 1; day <= days; day++) { const cell = document.createElement('div'); cell.className = 'calendar-day-cell'; const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; cell.innerHTML = `<div class="day-number">${day}</div>`; const tasks = allTasks.filter(t => t.dueDate === ds); tasks.slice(0, 3).forEach(t => { const el = document.createElement('div'); el.className = `calendar-task-item ${t.organization}-tag`; el.textContent = t.title; el.title = t.title; cell.appendChild(el); }); if (tasks.length > 3) cell.innerHTML += `<div class="text-xs text-zinc-500 mt-1">+${tasks.length - 3} more</div>`; DOM.mainCalendarGrid.appendChild(cell); }
+    }
+    function changeCalendarMonth(offset) { AppData.mainCalendar.currentDate.setMonth(AppData.mainCalendar.currentDate.getMonth() + offset); renderMainCalendar(); }
+    function renderMainTimeline() { /* ... (code unchanged) ... */
+        DOM.mainTimelineContainer.innerHTML = ''; const tasks = getAggregatedTasks().filter(t => t.dueDate).sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)); const today = new Date(); const end = new Date(); end.setDate(today.getDate() + 30); tasks.forEach(task => { const due = new Date(task.dueDate + "T00:00:00"); if (due >= today && due <= end) { const r = document.createElement('div'); r.className = 'timeline-row'; const name = document.createElement('div'); name.className = 'timeline-task-name'; name.textContent = task.title; name.title = `${task.title} (Due: ${Utils.formatDate(task.dueDate)})`; const barC = document.createElement('div'); barC.className = 'timeline-bar-container'; const bar = document.createElement('div'); bar.className = `timeline-bar ${task.organization}-tag`; const dur = end - today; const start = due - today; const left = (start / dur) * 100; bar.style.left = `${Math.max(0, Math.min(98, left))}%`; bar.style.width = '2%'; bar.title = `Due: ${Utils.formatDate(task.dueDate)}`; barC.appendChild(bar); r.appendChild(name); r.appendChild(barC); DOM.mainTimelineContainer.appendChild(r); } }); if (DOM.mainTimelineContainer.children.length === 0) DOM.mainTimelineContainer.innerHTML = '<p class="text-zinc-400 p-4">No tasks due soon.</p>';
+    }
+
+    // --- ABLE VIEW LOGIC ---
+    function addAbleTask() { /* ... (code unchanged) ... */
+        const title = DOM.ableTaskTitle.value.trim(); if (!title) { alert("Title required."); return; } const newTask = { id: Utils.generateId(), title, dueDate: DOM.ableTaskDueDate.value, assignee: DOM.ableTaskAssignee.value.trim(), notes: DOM.ableTaskNotes.value.trim(), recurring: DOM.ableTaskRecurring.value, status: 'todo', organization: 'able' }; AppData.ableTasks.push(newTask); renderAbleTasks(); DOM.ableTaskTitle.value = ''; DOM.ableTaskDueDate.value = ''; DOM.ableTaskAssignee.value = ''; DOM.ableTaskNotes.value = ''; DOM.ableTaskRecurring.value = 'none'; renderMasterTaskList(); renderMainPlanner(); renderMainCalendar(); renderMainTimeline();
+    }
+    function renderAbleTasks() { /* ... (code unchanged) ... */
+        DOM.ableKanbanBoard.querySelectorAll('.task-list').forEach(list => list.innerHTML = ''); let tasks = AppData.ableTasks; const search = DOM.ableSearchInput.value.toLowerCase(); const assignF = DOM.ableFilterAssignee.value.toLowerCase(); const dueF = DOM.ableFilterDueDate.value; if (search) tasks = tasks.filter(t => t.title.toLowerCase().includes(search) || (t.notes && t.notes.toLowerCase().includes(search))); if (assignF) tasks = tasks.filter(t => t.assignee && t.assignee.toLowerCase().includes(assignF)); if (dueF) tasks = tasks.filter(t => t.dueDate === dueF); tasks.forEach(task => { const col = DOM.ableKanbanBoard.querySelector(`.kanban-column[data-status="${task.status}"] .task-list`); if (col) col.appendChild(createTaskCardElement(task, 'able')); else DOM.ableKanbanBoard.querySelector(`.kanban-column[data-status="todo"] .task-list`).appendChild(createTaskCardElement(task, 'able')); }); setupDragAndDropListeners('#ableKanbanBoard', '.kanban-column', '.task-list');
+    }
+    function openAbleWorkflowBuilder() { /* ... (code unchanged) ... */
+        DOM.ableWorkflowName.value = ''; DOM.ableWorkflowStepsContainer.innerHTML = ''; addAbleWorkflowStepRow(); openModal('ableWorkflowModal');
+    }
+    function addAbleWorkflowStepRow(name = '', assignee = '') { /* ... (code unchanged) ... */
+        const stepDiv = document.createElement('div'); stepDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 items-center mb-2'; stepDiv.innerHTML = `<input type="text" placeholder="Step Name" value="${name}" class="md:col-span-2 workflow-step-name" style="background-color:#1A1A1A; color:var(--able-text-on-black); border:1px solid var(--able-accent);"><input type="text" placeholder="Assignee (Optional)" value="${assignee}" class="workflow-step-assignee" style="background-color:#1A1A1A; color:var(--able-text-on-black); border:1px solid var(--able-accent);">`; DOM.ableWorkflowStepsContainer.appendChild(stepDiv);
+    }
+    function saveAbleWorkflow() { /* ... (code unchanged) ... */
+        const name = DOM.ableWorkflowName.value.trim(); if (!name) { alert("Name required."); return; } const steps = []; DOM.ableWorkflowStepsContainer.querySelectorAll('.grid').forEach(r => { const sn = r.querySelector('.workflow-step-name').value.trim(); const sa = r.querySelector('.workflow-step-assignee').value.trim(); if (sn) steps.push({ name: sn, assignee: sa }); }); if (steps.length === 0) { alert("Add steps."); return; } AppData.ableWorkflows.push({ id: Utils.generateId(), name, steps, organization: 'able' }); alert(`ABLE Workflow "${name}" saved!`); console.log("ABLE Workflows:", AppData.ableWorkflows); closeModal('ableWorkflowModal');
+    }
+
+    // --- WISE VIEW LOGIC ---
+    function addWiseTask() { // New function for WISE task creation
+        const title = DOM.wiseTaskTitle.value.trim();
+        if (!title) { alert("Task title is required for WISE task."); return; }
+        const newTask = {
+            id: Utils.generateId(), title,
+            dueDate: DOM.wiseTaskDueDate.value,
+            assignee: DOM.wiseTaskAssignee.value.trim(),
+            notes: DOM.wiseTaskNotes.value.trim(),
+            recurring: DOM.wiseTaskRecurringNew.value, // Use new recurring ID
+            status: 'inbox', // Default status for new WISE tasks
+            organization: 'wise'
+        };
+        AppData.wiseTasks.push(newTask);
+        renderWiseTasks();
+        // Clear WISE form fields
+        DOM.wiseTaskTitle.value = '';
+        DOM.wiseTaskDueDate.value = '';
+        DOM.wiseTaskAssignee.value = '';
+        DOM.wiseTaskNotes.value = '';
+        DOM.wiseTaskRecurringNew.value = 'none';
+
+        renderMasterTaskList(); renderMainPlanner(); renderMainCalendar(); renderMainTimeline();
+    }
+
+    function triggerWiseWorkflow() { /* ... (code unchanged, but ensure it adds to AppData.wiseTasks) ... */
+        const name = DOM.wiseWorkflowNameInput.value.trim(); const email = DOM.wiseWorkflowEmailInput.value.trim(); const role = DOM.wiseWorkflowRoleSelect.value; if (!name || !role) { alert("Name and Role required."); return; } const tasks = []; const base = { organization: 'wise', assignee: 'Glenn (auto)', notes: `Workflow: ${name} (${email||'N/A'}), Role: ${role}` }; if (role === 'partner') { tasks.push({ ...base, id: Utils.generateId(), title: `Onboard Partner: ${name} - S1`, status: 'inbox', dueDate: Utils.getCurrentDate() }); tasks.push({ ...base, id: Utils.generateId(), title: `Partner Kick-off: ${name}`, status: 'inbox', dueDate: Utils.getDaysArray(new Date(), 2)[1].toISOString().split('T')[0] }); } else if (role === 'licensed') tasks.push({ ...base, id: Utils.generateId(), title: `Licensee Setup: ${name}`, status: 'inbox', dueDate: Utils.getCurrentDate() }); else tasks.push({ ...base, id: Utils.generateId(), title: `Client Pack: ${name}`, status: 'inbox', dueDate: Utils.getCurrentDate() }); AppData.wiseTasks.push(...tasks); renderWiseTasks(); DOM.wiseWorkflowNameInput.value = ''; DOM.wiseWorkflowEmailInput.value = ''; alert(`WISE Workflow triggered.`); renderMasterTaskList(); renderMainPlanner(); renderMainCalendar(); renderMainTimeline();
+    }
+    function renderWiseTasks() { /* ... (code unchanged) ... */
+        DOM.wiseKanbanBoard.querySelectorAll('.task-list').forEach(list => list.innerHTML = ''); AppData.wiseTasks.forEach(task => { const col = DOM.wiseKanbanBoard.querySelector(`.kanban-column[data-status="${task.status}"] .task-list`); if (col) col.appendChild(createTaskCardElement(task, 'wise')); else DOM.wiseKanbanBoard.querySelector(`.kanban-column[data-status="inbox"] .task-list`).appendChild(createTaskCardElement(task, 'wise')); }); setupDragAndDropListeners('#wiseKanbanBoard', '.kanban-column', '.task-list');
+    }
+    function addWiseQuickNote() { /* ... (code unchanged) ... */
+        const text = DOM.wiseQuickNotesArea.value.trim(); if (!text) return; const note = { id: Utils.generateId(), text, date: new Date().toLocaleString() }; AppData.wiseQuickNotes.unshift(note); renderWiseQuickNotes(); DOM.wiseQuickNotesArea.value = '';
+    }
+    function renderWiseQuickNotes() { /* ... (code unchanged) ... */
+        DOM.wiseQuickNotesList.innerHTML = ''; AppData.wiseQuickNotes.slice(0, 5).forEach(note => { const el = document.createElement('div'); el.className = 'p-2 rounded text-xs'; el.style.backgroundColor = '#282828'; el.innerHTML = `<p class="text-zinc-300">${note.text}</p><p class="text-zinc-500 text-right text-xs">${note.date}</p>`; DOM.wiseQuickNotesList.appendChild(el); });
+    }
+
+    // New WISE Workflow Builder Functions
+    function openWiseWorkflowBuilder() {
+        DOM.wiseNewWorkflowName.value = '';
+        DOM.wiseWorkflowStepsContainer.innerHTML = '';
+        addWiseWorkflowStepRow(); // Add one step by default
+        openModal('wiseWorkflowModal');
+    }
+    function addWiseWorkflowStepRow(name = '', assignee = '') {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 items-center mb-2';
+        stepDiv.innerHTML = `
+            <input type="text" placeholder="Step Name" value="${name}" class="md:col-span-2 workflow-step-name" style="background-color: #282828; color: var(--wise-text); border: 1px solid #444;">
+            <input type="text" placeholder="Assignee (Optional)" value="${assignee}" class="workflow-step-assignee" style="background-color: #282828; color: var(--wise-text); border: 1px solid #444;">
+        `;
+        DOM.wiseWorkflowStepsContainer.appendChild(stepDiv);
+    }
+    function saveWiseWorkflow() {
+        const name = DOM.wiseNewWorkflowName.value.trim();
+        if (!name) { alert("Workflow name is required for WISE workflow."); return; }
+        const steps = [];
+        DOM.wiseWorkflowStepsContainer.querySelectorAll('.grid').forEach(row => {
+            const stepName = row.querySelector('.workflow-step-name').value.trim();
+            const stepAssignee = row.querySelector('.workflow-step-assignee').value.trim();
+            if (stepName) steps.push({ name: stepName, assignee: stepAssignee });
+        });
+        if (steps.length === 0) { alert("Add at least one step to the WISE workflow."); return; }
+        AppData.wiseWorkflows.push({ id: Utils.generateId(), name, steps, organization: 'wise' });
+        alert(`WISE Workflow "${name}" saved!`);
+        console.log("WISE Workflows:", AppData.wiseWorkflows);
+        closeModal('wiseWorkflowModal');
+    }
+
+
+    // --- LOGO TOGGLE ---
+    let logoInterval;
+    function startLogoToggle() { if (logoInterval) clearInterval(logoInterval); DOM.navbarLogoAble.classList.add('active-logo'); DOM.navbarLogoWise.classList.remove('active-logo'); logoInterval = setInterval(() => { const isAble = DOM.navbarLogoAble.classList.contains('active-logo'); DOM.navbarLogoAble.classList.toggle('active-logo', !isAble); DOM.navbarLogoWise.classList.toggle('active-logo', isAble); }, 4000); }
+    function stopLogoToggle() { if (logoInterval) clearInterval(logoInterval); }
+
+    // --- INITIALIZATION & EVENT LISTENERS ---
+    document.addEventListener('DOMContentLoaded', () => {
+        DOM.navButtons.forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
+        renderMainPlanner(); renderMasterTaskList();
+        DOM.masterTaskTableHeaders.forEach(th => th.addEventListener('click', () => sortMasterTable(th.dataset.sort)));
+        DOM.filterMasterTaskName.addEventListener('input', renderMasterTaskList);
+        DOM.filterMasterTaskOrg.addEventListener('change', renderMasterTaskList);
+        DOM.filterMasterTaskAssignee.addEventListener('input', renderMasterTaskList);
+        DOM.mainTaskViewToggles.forEach(btn => btn.addEventListener('click', () => switchMainTaskView(btn.dataset.taskView)));
+        switchMainTaskView('list');
+        DOM.prevMonthBtn.addEventListener('click', () => changeCalendarMonth(-1));
+        DOM.nextMonthBtn.addEventListener('click', () => changeCalendarMonth(1));
+        // ABLE
+        DOM.ableAddTaskButton.addEventListener('click', addAbleTask); renderAbleTasks();
+        DOM.ableOpenWorkflowBuilder.addEventListener('click', openAbleWorkflowBuilder);
+        DOM.addAbleWorkflowStepBtn.addEventListener('click', () => addAbleWorkflowStepRow());
+        DOM.saveAbleWorkflowBtn.addEventListener('click', saveAbleWorkflow);
+        DOM.ableSearchInput.addEventListener('input', renderAbleTasks);
+        DOM.ableFilterAssignee.addEventListener('input', renderAbleTasks);
+        DOM.ableFilterDueDate.addEventListener('change', renderAbleTasks);
+        // WISE
+        DOM.wiseAddTaskButton.addEventListener('click', addWiseTask); // Listener for new WISE task button
+        DOM.wiseTriggerWorkflowButton.addEventListener('click', triggerWiseWorkflow);
+        DOM.wiseOpenWorkflowBuilder.addEventListener('click', openWiseWorkflowBuilder); // Listener for new WISE workflow builder
+        DOM.addWiseWorkflowStepBtn.addEventListener('click', () => addWiseWorkflowStepRow());
+        DOM.saveWiseWorkflowBtn.addEventListener('click', saveWiseWorkflow);
+        renderWiseTasks();
+        DOM.wiseAddQuickNoteButton.addEventListener('click', addWiseQuickNote); renderWiseQuickNotes();
+        // General
+        switchView('mainView');
+        startLogoToggle();
+    });
+    window.addEventListener('blur', stopLogoToggle);
+    window.addEventListener('focus', startLogoToggle);
+    </script>
+</body>
+</html>
