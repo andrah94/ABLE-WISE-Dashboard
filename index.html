@@ -9,152 +9,569 @@
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"> <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        /* Styles exactly as provided by the user in the previous turn */
+        /* Modern Design System - State of the Art */
         :root {
-            --main-bg: #18181B; /* Updated: Softer dark (zinc-900) */
-            --main-text: #FFFFFF;
-            --able-bg: #000000;
+            /* Light Mode (Default) */
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FA;
+            --bg-tertiary: #F1F3F5;
+            --bg-elevated: #FFFFFF;
+
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B7280;
+            --text-tertiary: #9CA3AF;
+
+            --border-light: #E5E7EB;
+            --border-medium: #D1D5DB;
+            --border-strong: #9CA3AF;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            /* Brand Colors - ABLE & WISE */
+            --able-primary: #000000;
             --able-accent: #C0C0C0;
-            --able-text-on-black: #FFFFFF;
-            --able-text-on-silver: #1A1A1A; /* Charcoal */
-            --wise-bg: #111111;
+            --able-light: #F5F5F5;
+            --able-gradient: linear-gradient(135deg, #000000 0%, #434343 100%);
+
+            --wise-primary: #D4AF37;
             --wise-accent: #FFD700;
-            --wise-text: #F0F0F0; /* Light gray */
-            --navbar-bg: #1F2937; /* Dark gray navbar */
-            --card-bg-main: #27272A; /* zinc-800 for cards on main view */
-            --column-bg-main: #27272A; /* zinc-800 for columns on main view */
-            --input-bg-main: #3F3F46; /* zinc-700 for inputs on main view */
-            --border-main: #52525B; /* zinc-600 for borders on main view */
+            --wise-light: #FFF9E6;
+            --wise-gradient: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+
+            /* UI Colors */
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --bg-elevated: #1E293B;
+
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-tertiary: #94A3B8;
+
+            --border-light: #334155;
+            --border-medium: #475569;
+            --border-strong: #64748B;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+
+            --able-light: #1A1A1A;
+            --wise-light: #2A2416;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding-top: 60px; /* Height of fixed navbar */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
             overflow-x: hidden;
-            background-color: var(--main-bg); /* Set default body background */
+            transition: background var(--transition-base), color var(--transition-base);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .fixed-navbar {
+        /* Modern Navigation */
+        .modern-header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 60px;
-            background-color: var(--navbar-bg);
-            color: var(--main-text);
+            height: 70px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 var(--spacing-2xl);
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
         }
 
-        .navbar-logo-container {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--spacing-2xl);
         }
-        .navbar-logo-container img {
-            height: 30px;
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .brand-logo {
+            height: 36px;
             width: auto;
-            display: none; 
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-         .navbar-logo-container img.active-logo {
-            display: inline-block; 
-            opacity: 1;
-        }
-         .navbar-title {
-            font-weight: bold;
-            font-size: 1.2rem;
+            transition: opacity var(--transition-base);
         }
 
-        .nav-toggle-buttons button {
-            background-color: transparent;
-            color: var(--main-text);
-            border: 1px solid transparent;
-            padding: 8px 15px;
-            margin: 0 5px;
-            border-radius: 5px;
+        .brand-logo.hidden {
+            display: none;
+        }
+
+        .brand-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--able-primary) 0%, var(--wise-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: var(--radius-lg);
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            transition: all var(--transition-fast);
+            position: relative;
         }
 
-        .nav-toggle-buttons button.active,
-        .nav-toggle-buttons button:hover {
-            background-color: #4F46E5; 
-            border-color: #4F46E5;
-            color: var(--main-text);
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
         }
 
-        .admin-icon .fa-user-shield {
-            font-size: 1.5rem;
-            color: var(--main-text);
+        .nav-tab.active {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-tab.able-tab.active {
+            background: var(--able-gradient);
+            color: white;
+        }
+
+        .nav-tab.wise-tab.active {
+            background: var(--wise-gradient);
+            color: white;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border-color: var(--border-medium);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 0.5rem var(--spacing-md);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-medium);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Modern Page Layout */
+        .app-container {
+            padding-top: 70px;
+            min-height: 100vh;
         }
 
         .page-container {
-            display: none; 
-            min-height: calc(100vh - 60px);
-            padding: 20px;
-            animation-duration: 0.5s;
-            animation-fill-mode: forwards;
-            position: absolute; 
-            width: 100%;
-            box-sizing: border-box;
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl);
+            animation: fadeIn 0.3s ease-out;
         }
 
         .page-container.active {
             display: block;
-            animation-name: fadeIn;
         }
 
-        .page-container.slide-in-from-right { animation-name: slideInFromRight; }
-        .page-container.slide-in-from-left { animation-name: slideInFromLeft; }
-        .page-container.slide-out-to-left { animation-name: slideOutToLeft; animation-fill-mode: forwards; }
-        .page-container.slide-out-to-right { animation-name: slideOutToRight; animation-fill-mode: forwards; }
-
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideInFromRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideInFromLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOutToLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
-        @keyframes slideOutToRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-
-        #mainView { background-color: var(--main-bg); color: var(--main-text); }
-        .daily-planner { display: flex; overflow-x: auto; padding-bottom: 15px; gap: 10px; }
-        .planner-day-column {
-            min-width: 250px; max-width: 300px; background-color: var(--column-bg-main);
-            border-radius: 8px; padding: 10px; height: 450px; overflow-y: auto; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .planner-day-column h3 {
-            border-bottom: 1px solid var(--border-main); padding-bottom: 8px; margin-bottom: 10px;
-            font-size: 0.95rem; color: #A1A1AA; text-align: center;
+
+        /* Modern Cards */
+        .modern-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
         }
+
+        .modern-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-medium);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Modern Task Cards */
         .task-card {
-            padding: 10px; border-radius: 6px; margin-bottom: 8px; cursor: grab;
-            border-left: 4px solid transparent; transition: box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            cursor: grab;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
         }
-        .task-card:hover { box-shadow: 0 0 10px rgba(79, 70, 229, 0.3); transform: translateY(-1px); }
-        #mainView .task-card { background-color: var(--card-bg-main); }
-        #mainView .task-card.able-tag { border-left-color: var(--able-accent); }
-        #mainView .task-card.wise-tag { border-left-color: var(--wise-accent); }
-        .task-card p { margin: 2px 0; font-size: 0.9em; }
-        .task-card .task-title { font-weight: 600; color: var(--main-text); }
-        .task-card .task-meta { font-size: 0.8em; color: #A1A1AA; }
 
-        .master-task-list table { width: 100%; border-collapse: collapse; }
-        .master-task-list th, .master-task-list td { padding: 10px 8px; border: 1px solid var(--border-main); text-align: left; font-size: 0.9rem;}
-        .master-task-list th { background-color: var(--column-bg-main); cursor: pointer; color: #D4D4D8; }
-        .master-task-list th:hover { background-color: #3F3F46; }
-        .master-task-list input[type="text"], .master-task-list select {
-            background-color: var(--input-bg-main); color: var(--main-text);
-            border: 1px solid var(--border-main); padding: 8px; border-radius: 4px;
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+            transition: width var(--transition-fast);
         }
-        .view-toggle-buttons button { background-color: var(--input-bg-main); margin-right: 5px; color: #D4D4D8; }
-        .view-toggle-buttons button.active { background-color: #4F46E5; color: var(--main-text); }
+
+        .task-card.able-tag::before {
+            background: var(--able-primary);
+        }
+
+        .task-card.wise-tag::before {
+            background: var(--wise-primary);
+        }
+
+        .task-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: var(--border-medium);
+        }
+
+        .task-card:hover::before {
+            width: 4px;
+        }
+
+        .task-card:active {
+            cursor: grabbing;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Modern Daily Planner */
+        .daily-planner {
+            display: flex;
+            gap: var(--spacing-md);
+            overflow-x: auto;
+            padding-bottom: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .planner-day-column {
+            min-width: 280px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            height: 500px;
+            overflow-y: auto;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+        }
+
+        .planner-day-column:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .planner-day-column h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        /* Modern Table */
+        .modern-table-container {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .modern-table thead {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modern-table th {
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            user-select: none;
+        }
+
+        .modern-table th:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modern-table td {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .modern-table tbody tr {
+            transition: all var(--transition-fast);
+        }
+
+        .modern-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .modern-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Modern Inputs & Forms */
+        .modern-input, .modern-select, .modern-textarea {
+            width: 100%;
+            padding: 0.625rem var(--spacing-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .modern-input:hover, .modern-select:hover, .modern-textarea:hover {
+            border-color: var(--border-medium);
+            background: var(--bg-tertiary);
+        }
+
+        .modern-input:focus, .modern-select:focus, .modern-textarea:focus {
+            border-color: var(--primary);
+            background: var(--bg-elevated);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modern-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Modern Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-medium);
+        }
+
+        .btn-able {
+            background: var(--able-gradient);
+            color: white;
+        }
+
+        .btn-wise {
+            background: var(--wise-gradient);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .calendar-grid-view { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background-color: var(--column-bg-main); padding:10px; border-radius: 8px; }
         .calendar-day-cell { min-height: 100px; background-color: var(--card-bg-main); padding: 5px; border-radius: 4px; font-size: 0.8em; border: 1px solid var(--border-main); }
@@ -266,21 +683,45 @@
 </head>
 <body>
 
-    <nav class="fixed-navbar">
-        <div class="navbar-logo-container">
-            <img id="navbarLogoAble" src="https://static.wixstatic.com/media/5e8141_0a6dcd8218ea4c8eb7cd62eaecbe75ba~mv2.png" alt="ABLE Logo" class="active-logo">
-            <img id="navbarLogoWise" src="https://static.wixstatic.com/media/5e8141_24f1e1c816bd46b7987e446519833fa7~mv2.jpg" alt="WISE Logo">
-            <span class="navbar-title">ABLE & WISE</span>
+    <!-- Modern Header -->
+    <header class="modern-header">
+        <div class="header-left">
+            <div class="brand-section">
+                <img id="navbarLogoAble" src="https://static.wixstatic.com/media/5e8141_0a6dcd8218ea4c8eb7cd62eaecbe75ba~mv2.png" alt="ABLE Logo" class="brand-logo">
+                <img id="navbarLogoWise" src="https://static.wixstatic.com/media/5e8141_24f1e1c816bd46b7987e446519833fa7~mv2.jpg" alt="WISE Logo" class="brand-logo hidden">
+                <span class="brand-name">ABLE & WISE</span>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-view="mainView">
+                    <i class="fas fa-th-large" style="margin-right: 6px;"></i>
+                    Dashboard
+                </button>
+                <button class="nav-tab able-tab" data-view="ableView">
+                    <i class="fas fa-heart" style="margin-right: 6px;"></i>
+                    ABLE Foundation
+                </button>
+                <button class="nav-tab wise-tab" data-view="wiseView">
+                    <i class="fas fa-chart-line" style="margin-right: 6px;"></i>
+                    WISE Financial
+                </button>
+            </div>
         </div>
-        <div class="nav-toggle-buttons">
-            <button data-view="mainView" class="active">Main View</button>
-            <button data-view="ableView">ABLE Foundation</button>
-            <button data-view="wiseView">WISE Financial</button>
+
+        <div class="header-right">
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
         </div>
-        <div class="admin-icon">
-            <i class="fas fa-user-shield"></i>
-        </div>
-    </nav>
+    </header>
+
+    <div class="app-container">
 
     <section id="mainView" class="page-container active">
         <h2 class="text-2xl font-bold mb-1 text-zinc-300">Aggregated Dashboard</h2>
@@ -643,7 +1084,7 @@
 
     // --- DOM ELEMENTS ---
     const DOM = {
-        navButtons: document.querySelectorAll('.nav-toggle-buttons button'),
+        navButtons: document.querySelectorAll('.nav-tab'),
         pageContainers: document.querySelectorAll('.page-container'),
         dailyPlanner: document.getElementById('dailyPlanner'),
         masterTaskTableBody: document.querySelector('#masterTaskTable tbody'),
@@ -1157,14 +1598,51 @@
     function startLogoToggle() { if (logoInterval) clearInterval(logoInterval); DOM.navbarLogoAble.classList.add('active-logo'); DOM.navbarLogoWise.classList.remove('active-logo'); logoInterval = setInterval(() => { const isAble = DOM.navbarLogoAble.classList.contains('active-logo'); DOM.navbarLogoAble.classList.toggle('active-logo', !isAble); DOM.navbarLogoWise.classList.toggle('active-logo', isAble); }, 4000); }
     function stopLogoToggle() { if (logoInterval) clearInterval(logoInterval); }
 
+    // --- THEME TOGGLE (Dark/Light Mode) ---
+    function initializeTheme() {
+        // Check for saved theme preference or default to 'light'
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+
+        Utils.showToast(`Switched to ${newTheme} mode`, 'info');
+    }
+
+    function updateThemeIcon(theme) {
+        const themeToggleBtn = document.getElementById('themeToggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.innerHTML = theme === 'light'
+                ? '<i class="fas fa-moon"></i>'
+                : '<i class="fas fa-sun"></i>';
+        }
+    }
+
     // --- INITIALIZATION & EVENT LISTENERS ---
     document.addEventListener('DOMContentLoaded', () => {
+        // Initialize theme
+        initializeTheme();
+
         // Load data from localStorage
         const loaded = Storage.load();
         if (loaded) {
             Utils.showToast('Data loaded successfully!', 'success');
         } else {
             Utils.showToast('Starting fresh - no saved data found', 'info');
+        }
+
+        // Theme toggle button
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
         }
 
         // Navigation
