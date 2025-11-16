@@ -10,6 +10,29 @@
 - ABLE Foundation (nonprofit/foundation)
 - WISE Financial Partners (financial services)
 
+## Recent Improvements (v2.0)
+
+The application has been significantly elevated with the following enhancements:
+
+### Core Features Added
+1. **LocalStorage Persistence** - All data now persists between sessions
+2. **Task Deletion** - Delete tasks with confirmation dialogs
+3. **Task Duplication** - Copy existing tasks easily
+4. **Modal-Based Editing** - Professional edit modal replacing browser prompts
+5. **Toast Notifications** - Beautiful, non-intrusive user feedback
+6. **Confirmation Dialogs** - Safety checks for destructive actions
+7. **Input Validation** - Client-side validation with helpful error messages
+8. **Mobile Responsiveness** - Improved layout for mobile devices
+9. **Auto-Save** - Automatic data persistence on every change + periodic backup
+
+### User Experience Improvements
+- **Professional UI feedback** via toast notifications (success, error, warning, info)
+- **Safer operations** with confirmation dialogs for deletions
+- **Better task management** with Edit, Copy, and Delete buttons in task table
+- **Form validation** prevents invalid data entry
+- **Responsive design** works on tablets and phones
+- **Data persistence** means work is never lost
+
 ## Architecture & File Structure
 
 ```
@@ -128,13 +151,49 @@ Central data store holding all application state:
 
 All DOM elements are cached in the `DOM` object for performance. Access elements via `DOM.elementName` instead of `document.getElementById()`.
 
-### Core Utility Functions (lines 399-404)
+### Core Utility Functions
 
 **Utils Object:**
 - `generateId()` - Creates unique task IDs
 - `getCurrentDate()` - Returns today's date in YYYY-MM-DD format
 - `getDaysArray(start, count)` - Generates array of dates
 - `formatDate(date, options)` - Formats dates for display
+- `validateTask(task)` - Validates task object, returns array of errors
+- `showToast(message, type)` - Displays toast notification (success, error, warning, info)
+- `confirm(title, message)` - Shows confirmation dialog, returns Promise<boolean>
+
+### Toast Notification System
+
+**Usage:**
+```javascript
+Utils.showToast('Task created successfully!', 'success');
+Utils.showToast('Invalid data', 'error');
+Utils.showToast('Please review', 'warning');
+Utils.showToast('Loading...', 'info');
+```
+
+**Features:**
+- Auto-dismisses after 4 seconds
+- Slide-in/out animations
+- Color-coded by type (green, red, orange, blue)
+- Stack multiple toasts
+- Manual dismiss option
+
+### Confirmation Dialog System
+
+**Usage:**
+```javascript
+const confirmed = await Utils.confirm('Delete Task', 'Are you sure?');
+if (confirmed) {
+    // Perform destructive action
+}
+```
+
+**Features:**
+- Promise-based async/await support
+- Prevents accidental deletions
+- Custom title and message
+- Cancel and Confirm buttons
 
 ### View Management (lines 483-510)
 
@@ -180,17 +239,34 @@ All DOM elements are cached in the `DOM` object for performance. Access elements
 ### Task Management Functions
 
 **Adding Tasks:**
-- `addAbleTask()` - Creates ABLE task from form (lines 578-580)
-- `addWiseTask()` - Creates WISE task from form (lines 595-617)
-
-**Note:** Tasks are added to respective arrays and all views are re-rendered.
+- `addAbleTask()` - Creates ABLE task from form with validation
+- `addWiseTask()` - Creates WISE task from form with validation
+- Both functions validate input, show toast notifications, and call autoSave()
 
 **Editing Tasks:**
-- `editTaskPrompt(taskId, taskOrg)` - Simple prompt-based editing (lines 560-562)
+- `editTask(taskId, taskOrg)` - Opens edit modal with task data
+- `saveTaskEdit()` - Validates and saves changes from edit modal
+- Uses professional modal interface (not browser prompts)
+- Shows success/error toasts
 
-**Filtering & Sorting:**
-- `sortMasterTable(column)` - Toggles sort order (lines 563-565)
+**Deleting Tasks:**
+- `deleteTask(taskId, taskOrg)` - Async function with confirmation dialog
+- Shows "Are you sure?" confirmation before deletion
+- Removes task from array, calls autoSave(), refreshes all views
+- Shows success toast with deleted task name
+
+**Duplicating Tasks:**
+- `duplicateTask(taskId, taskOrg)` - Creates copy of existing task
+- Appends " (Copy)" to title
+- Generates new unique ID
+- Shows success toast
+
+**Utility Functions:**
+- `refreshAllViews(organization)` - Re-renders all affected views
+- `sortMasterTable(column)` - Toggles sort order
 - Filters applied in render functions based on input values
+
+**Important:** All task operations call `autoSave()` to persist changes immediately.
 
 ### Workflow Management
 
@@ -368,26 +444,34 @@ function addOrganizationTask() {
 
 ### Data Persistence
 
-**Current State:** NO PERSISTENCE
-- All data is lost on page reload
-- AppData exists only in memory
-- No localStorage, sessionStorage, or backend integration
+**Current State:** ✅ FULL LOCAL PERSISTENCE
+- All data persists via localStorage
+- Automatic save on every data mutation
+- Automatic load on page load
+- Periodic backup every 30 seconds
+- Storage key: `ableWiseDashboardData`
 
-**To Add Persistence:**
-1. Implement `saveToLocalStorage()` function
-2. Call after each data mutation
-3. Implement `loadFromLocalStorage()` function
-4. Call in DOMContentLoaded before initial render
+**Storage Implementation:**
+- `Storage.save()` - Saves all app data to localStorage
+- `Storage.load()` - Loads data on app initialization
+- `Storage.clear()` - Clears all saved data
+- `autoSave()` - Called after every data change
+- Toast notifications inform users of save/load status
+
+**What's Saved:**
+- All tasks (main, ABLE, WISE)
+- All workflows (ABLE, WISE)
+- WISE quick notes
+- Sort preferences
 
 ### Known Limitations
 
-1. **No backend integration** - purely client-side
+1. **No backend integration** - purely client-side (data only on this browser)
 2. **No user authentication** - admin icon is decorative
-3. **No real workflow execution** - workflows saved but not executed
-4. **Simple edit functionality** - uses browser prompts, not inline editing
-5. **No task deletion** - feature not implemented
-6. **No data validation** - minimal client-side validation
-7. **No error handling** - limited try-catch blocks
+3. **No real workflow execution** - workflows saved but not auto-executed
+4. **No multi-user collaboration** - single-user application
+5. **No data sync across devices** - localStorage is per-browser
+6. **No export/import** - cannot backup to file or transfer to other browsers
 
 ## Testing Approach
 
@@ -427,6 +511,52 @@ function addOrganizationTask() {
 - [ ] Notes can be added
 - [ ] Most recent 5 notes display
 - [ ] Timestamps are correct
+
+**NEW - Data Persistence:**
+- [ ] Data persists after page reload
+- [ ] Toast shows on successful load
+- [ ] Data saves automatically after changes
+- [ ] Periodic backup works (check console every 30s)
+
+**NEW - Task Editing:**
+- [ ] Edit button opens modal with current task data
+- [ ] Can modify all task fields in modal
+- [ ] Save button updates task
+- [ ] Toast shows success message
+- [ ] All views refresh after edit
+
+**NEW - Task Deletion:**
+- [ ] Delete button shows confirmation dialog
+- [ ] Can cancel deletion
+- [ ] Confirming removes task
+- [ ] Toast shows deleted task name
+- [ ] All views refresh after deletion
+
+**NEW - Task Duplication:**
+- [ ] Copy button duplicates task
+- [ ] New task has " (Copy)" appended to title
+- [ ] Toast shows success
+- [ ] Duplicated task appears in all views
+
+**NEW - Validation & Errors:**
+- [ ] Empty title shows error toast
+- [ ] Title over 100 chars shows error
+- [ ] Invalid date shows error
+- [ ] Error toasts are red
+
+**NEW - Toast Notifications:**
+- [ ] Success toasts are green
+- [ ] Error toasts are red
+- [ ] Toasts auto-dismiss after 4 seconds
+- [ ] Multiple toasts stack properly
+- [ ] Can manually close toasts
+
+**NEW - Mobile Responsiveness:**
+- [ ] Navbar adapts on small screens
+- [ ] Daily planner stacks vertically on mobile
+- [ ] Task table scrolls horizontally if needed
+- [ ] Toasts fit on small screens
+- [ ] Modals are readable on mobile
 
 ## Common Modification Patterns
 
@@ -596,5 +726,26 @@ DOM.newFilter.addEventListener('input', renderFunction);
 ---
 
 **Last Updated:** 2025-11-16
-**Version:** 1.0
+**Version:** 2.0
 **Maintained for:** AI Assistants (Claude Code)
+
+## Version History
+
+### v2.0 (2025-11-16)
+- Added localStorage persistence with auto-save
+- Implemented task deletion with confirmation
+- Added task duplication feature
+- Replaced prompts with professional edit modal
+- Added toast notification system
+- Added confirmation dialog system
+- Implemented input validation
+- Enhanced mobile responsiveness
+- Added comprehensive error handling
+
+### v1.0 (2025-11-16)
+- Initial release with core functionality
+- Three-view dashboard (Main, ABLE, WISE)
+- Task creation and drag-and-drop
+- Kanban boards for both organizations
+- Calendar and timeline views
+- Basic workflow builders

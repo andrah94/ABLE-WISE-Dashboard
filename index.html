@@ -212,6 +212,52 @@
         .task-card.dragging { opacity: 0.5; border: 2px dashed #fff; transform: scale(1.05); }
         .drop-target-hover { background-color: rgba(79, 70, 229, 0.1) !important; border: 1px dashed #4F46E5; }
         .hidden { display: none !important; }
+
+        /* Toast Notifications */
+        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: #1F2937; color: #F0F0F0; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                 display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: 400px; animation: slideInRight 0.3s ease-out; }
+        .toast.success { border-left: 4px solid #10B981; }
+        .toast.error { border-left: 4px solid #EF4444; }
+        .toast.warning { border-left: 4px solid #F59E0B; }
+        .toast.info { border-left: 4px solid #3B82F6; }
+        .toast-icon { font-size: 1.2rem; }
+        .toast-message { flex: 1; font-size: 0.9rem; }
+        .toast-close { cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+        .toast-close:hover { opacity: 1; }
+        @keyframes slideInRight { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+
+        /* Confirmation Dialog */
+        .confirm-dialog { background-color: #1F2937; border: 2px solid #EF4444; max-width: 450px; }
+        .confirm-dialog .modal-header { border-color: #EF4444; }
+        .confirm-dialog h2 { color: #EF4444; }
+        .confirm-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .confirm-buttons button { flex: 1; max-width: 120px; }
+
+        /* Task Actions */
+        .task-actions { display: flex; gap: 5px; }
+        .task-actions button { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .btn-edit { background-color: #3B82F6; color: white; border: none; }
+        .btn-edit:hover { background-color: #2563EB; }
+        .btn-delete { background-color: #EF4444; color: white; border: none; }
+        .btn-delete:hover { background-color: #DC2626; }
+        .btn-duplicate { background-color: #8B5CF6; color: white; border: none; }
+        .btn-duplicate:hover { background-color: #7C3AED; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .fixed-navbar { flex-wrap: wrap; height: auto; padding: 10px; }
+            .navbar-title { font-size: 1rem; }
+            .nav-toggle-buttons { width: 100%; margin-top: 10px; display: flex; justify-content: center; }
+            .nav-toggle-buttons button { font-size: 0.8rem; padding: 6px 10px; }
+            .daily-planner { flex-direction: column; }
+            .planner-day-column { min-width: 100%; max-width: 100%; }
+            body { padding-top: 100px; }
+            .toast-container { right: 10px; left: 10px; }
+            .toast { min-width: auto; }
+        }
+
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: #2c2c2c; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; border: 2px solid #2c2c2c; }
@@ -393,6 +439,67 @@
         </div>
     </div>
 
+    <!-- Task Edit Modal -->
+    <div id="taskEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Task</h2>
+                <span class="close-button" onclick="closeModal('taskEditModal')">&times;</span>
+            </div>
+            <div class="mt-4">
+                <div class="mb-3">
+                    <label for="editTaskTitle" class="block text-sm font-medium mb-1">Title</label>
+                    <input type="text" id="editTaskTitle" class="w-full">
+                </div>
+                <div class="mb-3">
+                    <label for="editTaskDueDate" class="block text-sm font-medium mb-1">Due Date</label>
+                    <input type="date" id="editTaskDueDate" class="w-full">
+                </div>
+                <div class="mb-3">
+                    <label for="editTaskAssignee" class="block text-sm font-medium mb-1">Assignee</label>
+                    <input type="text" id="editTaskAssignee" class="w-full">
+                </div>
+                <div class="mb-3">
+                    <label for="editTaskNotes" class="block text-sm font-medium mb-1">Notes</label>
+                    <textarea id="editTaskNotes" rows="3" class="w-full"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="editTaskStatus" class="block text-sm font-medium mb-1">Status</label>
+                    <select id="editTaskStatus" class="w-full">
+                        <option value="todo">To Do</option>
+                        <option value="inbox">Inbox</option>
+                        <option value="assigned">Assigned</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="complete">Complete</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-6 text-right">
+                <button class="primary" id="saveTaskEdit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="modal">
+        <div class="modal-content confirm-dialog">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Confirm Action</h2>
+                <span class="close-button" onclick="closeModal('confirmDialog')">&times;</span>
+            </div>
+            <div class="mt-4">
+                <p id="confirmMessage">Are you sure?</p>
+            </div>
+            <div class="confirm-buttons">
+                <button id="confirmCancel" style="background-color: #6B7280; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Cancel</button>
+                <button id="confirmOk" style="background-color: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 4px;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script>
     // --- UTILITIES ---
@@ -400,16 +507,138 @@
         generateId: () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         getCurrentDate: () => new Date().toISOString().split('T')[0],
         getDaysArray: (start, count) => { const arr = []; for (let i = 0; i < count; i++) { const date = new Date(start); date.setDate(date.getDate() + i); arr.push(date); } return arr; },
-        formatDate: (date, options = { weekday: 'short', month: 'short', day: 'numeric' }) => { if (!date) return ''; const d = date instanceof Date ? date : new Date(date + 'T00:00:00'); if (isNaN(d.getTime())) return 'Invalid Date'; return d.toLocaleDateString(undefined, options); }
+        formatDate: (date, options = { weekday: 'short', month: 'short', day: 'numeric' }) => {
+            if (!date) return '';
+            const d = date instanceof Date ? date : new Date(date + 'T00:00:00');
+            if (isNaN(d.getTime())) return 'Invalid Date';
+            return d.toLocaleDateString(undefined, options);
+        },
+        validateTask: (task) => {
+            const errors = [];
+            if (!task.title || task.title.trim() === '') errors.push('Title is required');
+            if (task.title && task.title.length > 100) errors.push('Title must be less than 100 characters');
+            if (task.dueDate && isNaN(new Date(task.dueDate).getTime())) errors.push('Invalid due date');
+            return errors;
+        },
+        showToast: (message, type = 'info') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type] || icons.info}</span>
+                <span class="toast-message">${message}</span>
+                <span class="toast-close" onclick="this.parentElement.remove()">×</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        },
+        confirm: (title, message) => {
+            return new Promise((resolve) => {
+                const dialog = document.getElementById('confirmDialog');
+                const titleEl = document.getElementById('confirmTitle');
+                const messageEl = document.getElementById('confirmMessage');
+                const okBtn = document.getElementById('confirmOk');
+                const cancelBtn = document.getElementById('confirmCancel');
+
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                dialog.classList.add('active');
+
+                const cleanup = () => {
+                    dialog.classList.remove('active');
+                    okBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                };
+
+                okBtn.onclick = () => { cleanup(); resolve(true); };
+                cancelBtn.onclick = () => { cleanup(); resolve(false); };
+            });
+        }
     };
 
     // --- DATA STORE ---
     let AppData = {
         mainTasks: [], ableTasks: [], wiseTasks: [],
-        ableWorkflows: [], wiseWorkflows: [], // Changed from ableWorkflows to wiseWorkflows for WISE specific
+        ableWorkflows: [], wiseWorkflows: [],
         wiseQuickNotes: [],
         currentSort: { column: 'dueDate', order: 'asc' },
         mainCalendar: { currentDate: new Date() }
+    };
+
+    // --- LOCAL STORAGE ---
+    const Storage = {
+        STORAGE_KEY: 'ableWiseDashboardData',
+
+        save: () => {
+            try {
+                const dataToSave = {
+                    mainTasks: AppData.mainTasks,
+                    ableTasks: AppData.ableTasks,
+                    wiseTasks: AppData.wiseTasks,
+                    ableWorkflows: AppData.ableWorkflows,
+                    wiseWorkflows: AppData.wiseWorkflows,
+                    wiseQuickNotes: AppData.wiseQuickNotes,
+                    currentSort: AppData.currentSort,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem(Storage.STORAGE_KEY, JSON.stringify(dataToSave));
+                console.log('Data saved to localStorage');
+            } catch (error) {
+                console.error('Failed to save to localStorage:', error);
+                Utils.showToast('Failed to save data locally', 'error');
+            }
+        },
+
+        load: () => {
+            try {
+                const stored = localStorage.getItem(Storage.STORAGE_KEY);
+                if (stored) {
+                    const data = JSON.parse(stored);
+                    AppData.mainTasks = data.mainTasks || [];
+                    AppData.ableTasks = data.ableTasks || [];
+                    AppData.wiseTasks = data.wiseTasks || [];
+                    AppData.ableWorkflows = data.ableWorkflows || [];
+                    AppData.wiseWorkflows = data.wiseWorkflows || [];
+                    AppData.wiseQuickNotes = data.wiseQuickNotes || [];
+                    AppData.currentSort = data.currentSort || { column: 'dueDate', order: 'asc' };
+                    console.log('Data loaded from localStorage');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Failed to load from localStorage:', error);
+                Utils.showToast('Failed to load saved data', 'error');
+                return false;
+            }
+        },
+
+        clear: () => {
+            try {
+                localStorage.removeItem(Storage.STORAGE_KEY);
+                console.log('localStorage cleared');
+                Utils.showToast('All data cleared', 'info');
+            } catch (error) {
+                console.error('Failed to clear localStorage:', error);
+            }
+        }
+    };
+
+    // Auto-save on data changes
+    const autoSave = () => {
+        Storage.save();
     };
 
     // --- DOM ELEMENTS ---
@@ -543,8 +772,61 @@
     function handleDragOver(e) { e.preventDefault(); }
     function handleDragEnter(e) { e.preventDefault(); const dt = e.target.closest('.kanban-column, .planner-day-column'); if (dt) dt.classList.add('drop-target-hover'); }
     function handleDragLeave(e) { const dt = e.target.closest('.kanban-column, .planner-day-column'); if (dt) dt.classList.remove('drop-target-hover'); }
-    function handleDrop(e, taskListSelector) { /* ... (code unchanged) ... */
-        e.preventDefault(); if (!draggedItem) return; const targetColumn = e.target.closest('.kanban-column, .planner-day-column'); if (!targetColumn) return; targetColumn.classList.remove('drop-target-hover'); const taskList = targetColumn.querySelector(taskListSelector || '.task-list'); if (!taskList) { console.error("Task list container not found"); return; } const taskId = draggedItem.dataset.taskId; const newStatus = targetColumn.dataset.status; const newDate = targetColumn.dataset.date; let taskToUpdate, taskSourceArray; if (AppData.ableTasks.find(t => t.id === taskId)) taskSourceArray = AppData.ableTasks; else if (AppData.wiseTasks.find(t => t.id === taskId)) taskSourceArray = AppData.wiseTasks; else if (AppData.mainTasks.find(t => t.id === taskId)) taskSourceArray = AppData.mainTasks; if (taskSourceArray) taskToUpdate = taskSourceArray.find(t => t.id === taskId); if (taskToUpdate) { if (newStatus && currentPage !== 'mainView') taskToUpdate.status = newStatus; if (newDate && currentPage === 'mainView' && targetColumn.closest('#dailyPlanner')) taskToUpdate.dueDate = newDate; taskList.appendChild(draggedItem); if (currentPage === 'ableView') renderAbleTasks(); else if (currentPage === 'wiseView') renderWiseTasks(); renderMainPlanner(); renderMasterTaskList(); renderMainCalendar(); renderMainTimeline(); } else console.warn("Could not find task to update:", taskId); draggedItem.classList.remove('dragging'); draggedItem = null;
+    function handleDrop(e, taskListSelector) {
+        e.preventDefault();
+        if (!draggedItem) return;
+
+        const targetColumn = e.target.closest('.kanban-column, .planner-day-column');
+        if (!targetColumn) return;
+
+        targetColumn.classList.remove('drop-target-hover');
+        const taskList = targetColumn.querySelector(taskListSelector || '.task-list');
+        if (!taskList) {
+            console.error("Task list container not found");
+            return;
+        }
+
+        const taskId = draggedItem.dataset.taskId;
+        const newStatus = targetColumn.dataset.status;
+        const newDate = targetColumn.dataset.date;
+
+        let taskToUpdate, taskSourceArray, organization;
+        if (AppData.ableTasks.find(t => t.id === taskId)) {
+            taskSourceArray = AppData.ableTasks;
+            organization = 'able';
+        } else if (AppData.wiseTasks.find(t => t.id === taskId)) {
+            taskSourceArray = AppData.wiseTasks;
+            organization = 'wise';
+        } else if (AppData.mainTasks.find(t => t.id === taskId)) {
+            taskSourceArray = AppData.mainTasks;
+            organization = 'main';
+        }
+
+        if (taskSourceArray) taskToUpdate = taskSourceArray.find(t => t.id === taskId);
+
+        if (taskToUpdate) {
+            if (newStatus && currentPage !== 'mainView') taskToUpdate.status = newStatus;
+            if (newDate && currentPage === 'mainView' && targetColumn.closest('#dailyPlanner')) taskToUpdate.dueDate = newDate;
+
+            taskList.appendChild(draggedItem);
+
+            // Save changes
+            autoSave();
+
+            // Refresh views
+            if (currentPage === 'ableView') renderAbleTasks();
+            else if (currentPage === 'wiseView') renderWiseTasks();
+
+            renderMainPlanner();
+            renderMasterTaskList();
+            renderMainCalendar();
+            renderMainTimeline();
+        } else {
+            console.warn("Could not find task to update:", taskId);
+        }
+
+        draggedItem.classList.remove('dragging');
+        draggedItem = null;
     }
 
     // --- MAIN VIEW LOGIC ---
@@ -554,11 +836,173 @@
     function getAggregatedTasks() { /* ... (code unchanged) ... */
         const all = [...AppData.mainTasks, ...AppData.ableTasks, ...AppData.wiseTasks]; return Array.from(new Map(all.map(t => [t.id, t])).values());
     }
-    function renderMasterTaskList() { /* ... (code unchanged) ... */
-        const tbody = DOM.masterTaskTableBody; tbody.innerHTML = ''; let tasks = getAggregatedTasks(); const nameF = DOM.filterMasterTaskName.value.toLowerCase(); const orgF = DOM.filterMasterTaskOrg.value; const assigneeF = DOM.filterMasterTaskAssignee.value.toLowerCase(); if (nameF) tasks = tasks.filter(t => t.title.toLowerCase().includes(nameF)); if (orgF) tasks = tasks.filter(t => t.organization === orgF); if (assigneeF) tasks = tasks.filter(t => t.assignee && t.assignee.toLowerCase().includes(assigneeF)); tasks.sort((a, b) => { let va = a[AppData.currentSort.column] || ''; let vb = b[AppData.currentSort.column] || ''; if (AppData.currentSort.column === 'dueDate') { va = new Date(va || 0); vb = new Date(vb || 0); } if (typeof va === 'string') va = va.toLowerCase(); if (typeof vb === 'string') vb = vb.toLowerCase(); if (va < vb) return AppData.currentSort.order === 'asc' ? -1 : 1; if (va > vb) return AppData.currentSort.order === 'asc' ? 1 : -1; return 0; }); tasks.forEach(task => { const r = tbody.insertRow(); r.innerHTML = `<td>${task.title}</td><td class="capitalize ${task.organization === 'able' ? 'text-zinc-400' : task.organization === 'wise' ? 'text-yellow-400' : 'text-sky-400'}">${task.organization}</td><td>${Utils.formatDate(task.dueDate)}</td><td>${task.assignee || 'N/A'}</td><td class="capitalize">${task.status || 'N/A'}</td><td><button class="text-xs p-1 bg-indigo-600 hover:bg-indigo-700 rounded text-white" onclick="editTaskPrompt('${task.id}', '${task.organization}')">Edit</button></td>`; });
+    function renderMasterTaskList() {
+        const tbody = DOM.masterTaskTableBody;
+        tbody.innerHTML = '';
+        let tasks = getAggregatedTasks();
+
+        // Apply filters
+        const nameF = DOM.filterMasterTaskName.value.toLowerCase();
+        const orgF = DOM.filterMasterTaskOrg.value;
+        const assigneeF = DOM.filterMasterTaskAssignee.value.toLowerCase();
+
+        if (nameF) tasks = tasks.filter(t => t.title.toLowerCase().includes(nameF));
+        if (orgF) tasks = tasks.filter(t => t.organization === orgF);
+        if (assigneeF) tasks = tasks.filter(t => t.assignee && t.assignee.toLowerCase().includes(assigneeF));
+
+        // Sort tasks
+        tasks.sort((a, b) => {
+            let va = a[AppData.currentSort.column] || '';
+            let vb = b[AppData.currentSort.column] || '';
+            if (AppData.currentSort.column === 'dueDate') {
+                va = new Date(va || 0);
+                vb = new Date(vb || 0);
+            }
+            if (typeof va === 'string') va = va.toLowerCase();
+            if (typeof vb === 'string') vb = vb.toLowerCase();
+            if (va < vb) return AppData.currentSort.order === 'asc' ? -1 : 1;
+            if (va > vb) return AppData.currentSort.order === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        // Render tasks
+        tasks.forEach(task => {
+            const r = tbody.insertRow();
+            r.innerHTML = `
+                <td>${task.title}</td>
+                <td class="capitalize ${task.organization === 'able' ? 'text-zinc-400' : task.organization === 'wise' ? 'text-yellow-400' : 'text-sky-400'}">
+                    ${task.organization}
+                </td>
+                <td>${Utils.formatDate(task.dueDate)}</td>
+                <td>${task.assignee || 'N/A'}</td>
+                <td class="capitalize">${task.status || 'N/A'}</td>
+                <td>
+                    <div class="task-actions">
+                        <button class="btn-edit" onclick="editTask('${task.id}', '${task.organization}')">Edit</button>
+                        <button class="btn-duplicate" onclick="duplicateTask('${task.id}', '${task.organization}')">Copy</button>
+                        <button class="btn-delete" onclick="deleteTask('${task.id}', '${task.organization}')">Delete</button>
+                    </div>
+                </td>
+            `;
+        });
     }
-    function editTaskPrompt(taskId, taskOrg) { /* ... (code unchanged) ... */
-        let arr; if (taskOrg === 'able') arr = AppData.ableTasks; else if (taskOrg === 'wise') arr = AppData.wiseTasks; else arr = AppData.mainTasks; const task = arr.find(t => t.id === taskId); if (!task) { alert('Task not found!'); return; } const nt = prompt(`Edit title:`, task.title); if (nt !== null && nt.trim() !== "") task.title = nt.trim(); const nd = prompt(`Edit due date (YYYY-MM-DD):`, task.dueDate); if (nd !== null) task.dueDate = nd; const na = prompt(`Edit assignee:`, task.assignee); if (na !== null) task.assignee = na.trim(); renderMasterTaskList(); renderMainPlanner(); if (taskOrg === 'able') renderAbleTasks(); if (taskOrg === 'wise') renderWiseTasks(); renderMainCalendar(); renderMainTimeline();
+    // New modal-based task editing
+    let currentEditingTask = null;
+
+    function editTask(taskId, taskOrg) {
+        let arr;
+        if (taskOrg === 'able') arr = AppData.ableTasks;
+        else if (taskOrg === 'wise') arr = AppData.wiseTasks;
+        else arr = AppData.mainTasks;
+
+        const task = arr.find(t => t.id === taskId);
+        if (!task) {
+            Utils.showToast('Task not found!', 'error');
+            return;
+        }
+
+        currentEditingTask = { task, organization: taskOrg };
+
+        // Populate edit modal
+        document.getElementById('editTaskTitle').value = task.title || '';
+        document.getElementById('editTaskDueDate').value = task.dueDate || '';
+        document.getElementById('editTaskAssignee').value = task.assignee || '';
+        document.getElementById('editTaskNotes').value = task.notes || '';
+        document.getElementById('editTaskStatus').value = task.status || 'todo';
+
+        openModal('taskEditModal');
+    }
+
+    function saveTaskEdit() {
+        if (!currentEditingTask) return;
+
+        const { task, organization } = currentEditingTask;
+
+        // Get values
+        const title = document.getElementById('editTaskTitle').value.trim();
+        const dueDate = document.getElementById('editTaskDueDate').value;
+        const assignee = document.getElementById('editTaskAssignee').value.trim();
+        const notes = document.getElementById('editTaskNotes').value.trim();
+        const status = document.getElementById('editTaskStatus').value;
+
+        // Validate
+        const errors = Utils.validateTask({ title, dueDate });
+        if (errors.length > 0) {
+            Utils.showToast(errors.join(', '), 'error');
+            return;
+        }
+
+        // Update task
+        task.title = title;
+        task.dueDate = dueDate;
+        task.assignee = assignee;
+        task.notes = notes;
+        task.status = status;
+
+        // Save and refresh
+        autoSave();
+        refreshAllViews(organization);
+        closeModal('taskEditModal');
+        Utils.showToast('Task updated successfully!', 'success');
+        currentEditingTask = null;
+    }
+
+    async function deleteTask(taskId, taskOrg) {
+        const confirmed = await Utils.confirm(
+            'Delete Task',
+            'Are you sure you want to delete this task? This action cannot be undone.'
+        );
+
+        if (!confirmed) return;
+
+        let arr;
+        if (taskOrg === 'able') arr = AppData.ableTasks;
+        else if (taskOrg === 'wise') arr = AppData.wiseTasks;
+        else arr = AppData.mainTasks;
+
+        const index = arr.findIndex(t => t.id === taskId);
+        if (index > -1) {
+            const task = arr[index];
+            arr.splice(index, 1);
+            autoSave();
+            refreshAllViews(taskOrg);
+            Utils.showToast(`"${task.title}" deleted successfully`, 'success');
+        } else {
+            Utils.showToast('Task not found!', 'error');
+        }
+    }
+
+    function duplicateTask(taskId, taskOrg) {
+        let arr;
+        if (taskOrg === 'able') arr = AppData.ableTasks;
+        else if (taskOrg === 'wise') arr = AppData.wiseTasks;
+        else arr = AppData.mainTasks;
+
+        const task = arr.find(t => t.id === taskId);
+        if (!task) {
+            Utils.showToast('Task not found!', 'error');
+            return;
+        }
+
+        const newTask = {
+            ...task,
+            id: Utils.generateId(),
+            title: `${task.title} (Copy)`
+        };
+
+        arr.push(newTask);
+        autoSave();
+        refreshAllViews(taskOrg);
+        Utils.showToast(`Task duplicated: "${newTask.title}"`, 'success');
+    }
+
+    function refreshAllViews(organization) {
+        renderMasterTaskList();
+        renderMainPlanner();
+        renderMainCalendar();
+        renderMainTimeline();
+        if (organization === 'able') renderAbleTasks();
+        if (organization === 'wise') renderWiseTasks();
     }
     function sortMasterTable(column) { /* ... (code unchanged) ... */
         if (AppData.currentSort.column === column) AppData.currentSort.order = AppData.currentSort.order === 'asc' ? 'desc' : 'asc'; else { AppData.currentSort.column = column; AppData.currentSort.order = 'asc'; } DOM.masterTaskTableHeaders.forEach(th => { th.classList.remove('sort-asc', 'sort-desc'); if (th.dataset.sort === AppData.currentSort.column) th.classList.add(AppData.currentSort.order === 'asc' ? 'sort-asc' : 'sort-desc'); }); renderMasterTaskList();
@@ -575,8 +1019,41 @@
     }
 
     // --- ABLE VIEW LOGIC ---
-    function addAbleTask() { /* ... (code unchanged) ... */
-        const title = DOM.ableTaskTitle.value.trim(); if (!title) { alert("Title required."); return; } const newTask = { id: Utils.generateId(), title, dueDate: DOM.ableTaskDueDate.value, assignee: DOM.ableTaskAssignee.value.trim(), notes: DOM.ableTaskNotes.value.trim(), recurring: DOM.ableTaskRecurring.value, status: 'todo', organization: 'able' }; AppData.ableTasks.push(newTask); renderAbleTasks(); DOM.ableTaskTitle.value = ''; DOM.ableTaskDueDate.value = ''; DOM.ableTaskAssignee.value = ''; DOM.ableTaskNotes.value = ''; DOM.ableTaskRecurring.value = 'none'; renderMasterTaskList(); renderMainPlanner(); renderMainCalendar(); renderMainTimeline();
+    function addAbleTask() {
+        const title = DOM.ableTaskTitle.value.trim();
+        const dueDate = DOM.ableTaskDueDate.value;
+
+        const newTask = {
+            id: Utils.generateId(),
+            title,
+            dueDate,
+            assignee: DOM.ableTaskAssignee.value.trim(),
+            notes: DOM.ableTaskNotes.value.trim(),
+            recurring: DOM.ableTaskRecurring.value,
+            status: 'todo',
+            organization: 'able'
+        };
+
+        // Validate
+        const errors = Utils.validateTask(newTask);
+        if (errors.length > 0) {
+            Utils.showToast(errors.join(', '), 'error');
+            return;
+        }
+
+        AppData.ableTasks.push(newTask);
+        autoSave();
+        renderAbleTasks();
+        refreshAllViews('able');
+
+        // Clear form
+        DOM.ableTaskTitle.value = '';
+        DOM.ableTaskDueDate.value = '';
+        DOM.ableTaskAssignee.value = '';
+        DOM.ableTaskNotes.value = '';
+        DOM.ableTaskRecurring.value = 'none';
+
+        Utils.showToast(`ABLE task "${title}" created successfully!`, 'success');
     }
     function renderAbleTasks() { /* ... (code unchanged) ... */
         DOM.ableKanbanBoard.querySelectorAll('.task-list').forEach(list => list.innerHTML = ''); let tasks = AppData.ableTasks; const search = DOM.ableSearchInput.value.toLowerCase(); const assignF = DOM.ableFilterAssignee.value.toLowerCase(); const dueF = DOM.ableFilterDueDate.value; if (search) tasks = tasks.filter(t => t.title.toLowerCase().includes(search) || (t.notes && t.notes.toLowerCase().includes(search))); if (assignF) tasks = tasks.filter(t => t.assignee && t.assignee.toLowerCase().includes(assignF)); if (dueF) tasks = tasks.filter(t => t.dueDate === dueF); tasks.forEach(task => { const col = DOM.ableKanbanBoard.querySelector(`.kanban-column[data-status="${task.status}"] .task-list`); if (col) col.appendChild(createTaskCardElement(task, 'able')); else DOM.ableKanbanBoard.querySelector(`.kanban-column[data-status="todo"] .task-list`).appendChild(createTaskCardElement(task, 'able')); }); setupDragAndDropListeners('#ableKanbanBoard', '.kanban-column', '.task-list');
@@ -592,28 +1069,41 @@
     }
 
     // --- WISE VIEW LOGIC ---
-    function addWiseTask() { // New function for WISE task creation
+    function addWiseTask() {
         const title = DOM.wiseTaskTitle.value.trim();
-        if (!title) { alert("Task title is required for WISE task."); return; }
+        const dueDate = DOM.wiseTaskDueDate.value;
+
         const newTask = {
-            id: Utils.generateId(), title,
-            dueDate: DOM.wiseTaskDueDate.value,
+            id: Utils.generateId(),
+            title,
+            dueDate,
             assignee: DOM.wiseTaskAssignee.value.trim(),
             notes: DOM.wiseTaskNotes.value.trim(),
-            recurring: DOM.wiseTaskRecurringNew.value, // Use new recurring ID
-            status: 'inbox', // Default status for new WISE tasks
+            recurring: DOM.wiseTaskRecurringNew.value,
+            status: 'inbox',
             organization: 'wise'
         };
+
+        // Validate
+        const errors = Utils.validateTask(newTask);
+        if (errors.length > 0) {
+            Utils.showToast(errors.join(', '), 'error');
+            return;
+        }
+
         AppData.wiseTasks.push(newTask);
+        autoSave();
         renderWiseTasks();
-        // Clear WISE form fields
+        refreshAllViews('wise');
+
+        // Clear form
         DOM.wiseTaskTitle.value = '';
         DOM.wiseTaskDueDate.value = '';
         DOM.wiseTaskAssignee.value = '';
         DOM.wiseTaskNotes.value = '';
         DOM.wiseTaskRecurringNew.value = 'none';
 
-        renderMasterTaskList(); renderMainPlanner(); renderMainCalendar(); renderMainTimeline();
+        Utils.showToast(`WISE task "${title}" created successfully!`, 'success');
     }
 
     function triggerWiseWorkflow() { /* ... (code unchanged, but ensure it adds to AppData.wiseTasks) ... */
@@ -669,8 +1159,20 @@
 
     // --- INITIALIZATION & EVENT LISTENERS ---
     document.addEventListener('DOMContentLoaded', () => {
+        // Load data from localStorage
+        const loaded = Storage.load();
+        if (loaded) {
+            Utils.showToast('Data loaded successfully!', 'success');
+        } else {
+            Utils.showToast('Starting fresh - no saved data found', 'info');
+        }
+
+        // Navigation
         DOM.navButtons.forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
-        renderMainPlanner(); renderMasterTaskList();
+
+        // Main View
+        renderMainPlanner();
+        renderMasterTaskList();
         DOM.masterTaskTableHeaders.forEach(th => th.addEventListener('click', () => sortMasterTable(th.dataset.sort)));
         DOM.filterMasterTaskName.addEventListener('input', renderMasterTaskList);
         DOM.filterMasterTaskOrg.addEventListener('change', renderMasterTaskList);
@@ -679,26 +1181,43 @@
         switchMainTaskView('list');
         DOM.prevMonthBtn.addEventListener('click', () => changeCalendarMonth(-1));
         DOM.nextMonthBtn.addEventListener('click', () => changeCalendarMonth(1));
+
+        // Task Edit Modal
+        document.getElementById('saveTaskEdit').addEventListener('click', saveTaskEdit);
+
         // ABLE
-        DOM.ableAddTaskButton.addEventListener('click', addAbleTask); renderAbleTasks();
+        DOM.ableAddTaskButton.addEventListener('click', addAbleTask);
+        renderAbleTasks();
         DOM.ableOpenWorkflowBuilder.addEventListener('click', openAbleWorkflowBuilder);
         DOM.addAbleWorkflowStepBtn.addEventListener('click', () => addAbleWorkflowStepRow());
         DOM.saveAbleWorkflowBtn.addEventListener('click', saveAbleWorkflow);
         DOM.ableSearchInput.addEventListener('input', renderAbleTasks);
         DOM.ableFilterAssignee.addEventListener('input', renderAbleTasks);
         DOM.ableFilterDueDate.addEventListener('change', renderAbleTasks);
+
         // WISE
-        DOM.wiseAddTaskButton.addEventListener('click', addWiseTask); // Listener for new WISE task button
+        DOM.wiseAddTaskButton.addEventListener('click', addWiseTask);
         DOM.wiseTriggerWorkflowButton.addEventListener('click', triggerWiseWorkflow);
-        DOM.wiseOpenWorkflowBuilder.addEventListener('click', openWiseWorkflowBuilder); // Listener for new WISE workflow builder
+        DOM.wiseOpenWorkflowBuilder.addEventListener('click', openWiseWorkflowBuilder);
         DOM.addWiseWorkflowStepBtn.addEventListener('click', () => addWiseWorkflowStepRow());
         DOM.saveWiseWorkflowBtn.addEventListener('click', saveWiseWorkflow);
         renderWiseTasks();
-        DOM.wiseAddQuickNoteButton.addEventListener('click', addWiseQuickNote); renderWiseQuickNotes();
+        DOM.wiseAddQuickNoteButton.addEventListener('click', addWiseQuickNote);
+        renderWiseQuickNotes();
+
         // General
         switchView('mainView');
         startLogoToggle();
+
+        // Periodic auto-save (every 30 seconds as backup)
+        setInterval(() => {
+            if (AppData.mainTasks.length > 0 || AppData.ableTasks.length > 0 || AppData.wiseTasks.length > 0) {
+                Storage.save();
+                console.log('Auto-saved data');
+            }
+        }, 30000);
     });
+
     window.addEventListener('blur', stopLogoToggle);
     window.addEventListener('focus', startLogoToggle);
     </script>
