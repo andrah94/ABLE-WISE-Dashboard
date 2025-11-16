@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABLE & WISE Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet"> <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -573,6 +574,170 @@
             justify-content: center;
         }
 
+        /* Dashboard Widgets */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .stat-card.able-stat::before {
+            background: var(--able-gradient);
+        }
+
+        .stat-card.wise-stat::before {
+            background: var(--wise-gradient);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--error);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-top: var(--spacing-lg);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Export/Import */
+        .export-import-section {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+            margin: var(--spacing-lg) 0;
+        }
+
         .calendar-grid-view { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background-color: var(--column-bg-main); padding:10px; border-radius: 8px; }
         .calendar-day-cell { min-height: 100px; background-color: var(--card-bg-main); padding: 5px; border-radius: 4px; font-size: 0.8em; border: 1px solid var(--border-main); }
         .calendar-day-cell .day-number { font-weight: bold; margin-bottom: 5px; color: #D4D4D8; }
@@ -724,16 +889,87 @@
     <div class="app-container">
 
     <section id="mainView" class="page-container active">
-        <h2 class="text-2xl font-bold mb-1 text-zinc-300">Aggregated Dashboard</h2>
-        <p class="text-sm text-zinc-400 mb-6">Overview of all tasks and daily planning. Task creation is managed within specific ABLE or WISE views.</p>
-        <h3 class="text-xl font-semibold mt-6 mb-3 text-zinc-300">Daily Planner</h3>
-        <div id="dailyPlanner" class="daily-planner"></div>
-        <div class="mt-8 mb-4 flex items-center justify-between">
-            <h3 class="text-xl font-semibold text-zinc-300">All Tasks</h3>
-            <div class="view-toggle-buttons">
-                <button data-task-view="list" class="active p-2 rounded">List</button>
-                <button data-task-view="calendar" class="p-2 rounded">Calendar</button>
-                <button data-task-view="timeline" class="p-2 rounded">Timeline</button>
+        <!-- Header with Export/Import -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+            <div>
+                <h2 style="font-size: 1.875rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+                    Aggregated Dashboard
+                </h2>
+                <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                    Overview of all tasks and analytics across ABLE & WISE
+                </p>
+            </div>
+            <div class="export-import-section">
+                <button class="btn btn-secondary btn-sm" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Export Data
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('importFile').click()">
+                    <i class="fas fa-upload"></i>
+                    Import Data
+                </button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+
+        <!-- Charts Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-2xl);">
+            <div class="chart-container">
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                    Tasks by Status
+                </h3>
+                <div class="chart-wrapper">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                    Tasks by Organization
+                </h3>
+                <div class="chart-wrapper">
+                    <canvas id="orgChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed & Daily Planner Row -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-2xl);">
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-lg);">
+                    7-Day Planner
+                </h3>
+                <div id="dailyPlanner" class="daily-planner"></div>
+            </div>
+            <div class="activity-feed">
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                    Recent Activity
+                </h3>
+                <div id="activityFeed">
+                    <!-- Activity will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- All Tasks Section -->
+        <div style="margin-top: 2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-lg);">
+                <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">All Tasks</h3>
+                <div style="display: flex; gap: var(--spacing-sm);">
+                    <button class="btn btn-secondary btn-sm active" data-task-view="list">
+                        <i class="fas fa-list"></i> List
+                    </button>
+                    <button class="btn btn-secondary btn-sm" data-task-view="calendar">
+                        <i class="fas fa-calendar"></i> Calendar
+                    </button>
+                    <button class="btn btn-secondary btn-sm" data-task-view="timeline">
+                        <i class="fas fa-chart-gantt"></i> Timeline
+                    </button>
+                </div>
             </div>
         </div>
         <div id="mainTaskListView" class="main-task-view-content">
@@ -1593,6 +1829,336 @@
     }
 
 
+    // --- DASHBOARD ANALYTICS & WIDGETS ---
+    let statusChart, orgChart;
+
+    function calculateStats() {
+        const allTasks = [...AppData.ableTasks, ...AppData.wiseTasks, ...AppData.mainTasks];
+        const completedTasks = allTasks.filter(t => t.status === 'completed' || t.status === 'complete');
+        const today = new Date();
+        const thisWeek = allTasks.filter(t => {
+            if (!t.dueDate) return false;
+            const due = new Date(t.dueDate);
+            const diffTime = due - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays <= 7;
+        });
+
+        return {
+            totalTasks: allTasks.length,
+            completedTasks: completedTasks.length,
+            ableCount: AppData.ableTasks.length,
+            wiseCount: AppData.wiseTasks.length,
+            dueThisWeek: thisWeek.length,
+            completionRate: allTasks.length > 0 ? Math.round((completedTasks.length / allTasks.length) * 100) : 0
+        };
+    }
+
+    function renderDashboardStats() {
+        const stats = calculateStats();
+        const statsGrid = document.getElementById('statsGrid');
+
+        statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Tasks</span>
+                    <div class="stat-icon" style="background: rgba(79, 70, 229, 0.1); color: var(--primary);">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${stats.totalTasks}</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    Active across all organizations
+                </div>
+            </div>
+
+            <div class="stat-card able-stat">
+                <div class="stat-header">
+                    <span class="stat-title">ABLE Tasks</span>
+                    <div class="stat-icon" style="background: rgba(192, 192, 192, 0.1); color: var(--able-accent);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${stats.ableCount}</div>
+                <div class="stat-change">
+                    Foundation projects
+                </div>
+            </div>
+
+            <div class="stat-card wise-stat">
+                <div class="stat-header">
+                    <span class="stat-title">WISE Tasks</span>
+                    <div class="stat-icon" style="background: rgba(212, 175, 55, 0.1); color: var(--wise-primary);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${stats.wiseCount}</div>
+                <div class="stat-change">
+                    Financial services
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Completion Rate</span>
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${stats.completionRate}%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    ${stats.completedTasks} of ${stats.totalTasks} completed
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Due This Week</span>
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                </div>
+                <div class="stat-value">${stats.dueThisWeek}</div>
+                <div class="stat-change">
+                    Next 7 days
+                </div>
+            </div>
+        `;
+    }
+
+    function renderCharts() {
+        const allTasks = [...AppData.ableTasks, ...AppData.wiseTasks, ...AppData.mainTasks];
+
+        // Tasks by Status Chart
+        const statusCounts = {};
+        allTasks.forEach(task => {
+            const status = task.status || 'unassigned';
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+        });
+
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(statusCounts).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+                    datasets: [{
+                        data: Object.values(statusCounts),
+                        backgroundColor: [
+                            'rgba(79, 70, 229, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(156, 163, 175, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-elevated')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Tasks by Organization Chart
+        const orgCounts = {
+            ABLE: AppData.ableTasks.length,
+            WISE: AppData.wiseTasks.length,
+            Main: AppData.mainTasks.length
+        };
+
+        const orgCtx = document.getElementById('orgChart');
+        if (orgCtx) {
+            if (orgChart) orgChart.destroy();
+            orgChart = new Chart(orgCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(orgCounts),
+                    datasets: [{
+                        label: 'Tasks',
+                        data: Object.values(orgCounts),
+                        backgroundColor: [
+                            'rgba(192, 192, 192, 0.8)',
+                            'rgba(212, 175, 55, 0.8)',
+                            'rgba(79, 70, 229, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-elevated'),
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+                                font: { size: 11 }
+                            },
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--border-light')
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                                font: { size: 12, weight: 600 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function renderActivityFeed() {
+        const activityFeed = document.getElementById('activityFeed');
+        const allTasks = [...AppData.ableTasks, ...AppData.wiseTasks, ...AppData.mainTasks];
+
+        // Sort by most recently created (using ID timestamp)
+        const recentTasks = allTasks
+            .sort((a, b) => b.id.localeCompare(a.id))
+            .slice(0, 10);
+
+        if (recentTasks.length === 0) {
+            activityFeed.innerHTML = '<p style="text-align: center; color: var(--text-tertiary); padding: 2rem;">No recent activity</p>';
+            return;
+        }
+
+        activityFeed.innerHTML = recentTasks.map(task => {
+            const org = task.organization === 'able' ? 'ABLE' : task.organization === 'wise' ? 'WISE' : 'Main';
+            const iconColor = task.organization === 'able' ? 'var(--able-primary)' :
+                             task.organization === 'wise' ? 'var(--wise-primary)' : 'var(--primary)';
+
+            return `
+                <div class="activity-item">
+                    <div class="activity-avatar" style="background: ${iconColor};">
+                        ${org.charAt(0)}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">
+                            <strong>${task.title}</strong> added to ${org}
+                        </div>
+                        <div class="activity-time">
+                            ${task.assignee ? `Assigned to ${task.assignee}` : 'Unassigned'} •
+                            ${task.dueDate ? `Due ${Utils.formatDate(task.dueDate)}` : 'No due date'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // --- EXPORT/IMPORT FUNCTIONALITY ---
+    function exportData() {
+        const dataToExport = {
+            version: '3.0',
+            exported: new Date().toISOString(),
+            data: {
+                mainTasks: AppData.mainTasks,
+                ableTasks: AppData.ableTasks,
+                wiseTasks: AppData.wiseTasks,
+                ableWorkflows: AppData.ableWorkflows,
+                wiseWorkflows: AppData.wiseWorkflows,
+                wiseQuickNotes: AppData.wiseQuickNotes
+            }
+        };
+
+        const dataStr = JSON.stringify(dataToExport, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `able-wise-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        Utils.showToast('Data exported successfully!', 'success');
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+
+                const confirmed = await Utils.confirm(
+                    'Import Data',
+                    'This will replace all current data. Are you sure you want to continue?'
+                );
+
+                if (!confirmed) {
+                    event.target.value = '';
+                    return;
+                }
+
+                if (importedData.data) {
+                    AppData.mainTasks = importedData.data.mainTasks || [];
+                    AppData.ableTasks = importedData.data.ableTasks || [];
+                    AppData.wiseTasks = importedData.data.wiseTasks || [];
+                    AppData.ableWorkflows = importedData.data.ableWorkflows || [];
+                    AppData.wiseWorkflows = importedData.data.wiseWorkflows || [];
+                    AppData.wiseQuickNotes = importedData.data.wiseQuickNotes || [];
+
+                    autoSave();
+                    refreshAllViews('main');
+                    refreshDashboard();
+
+                    Utils.showToast('Data imported successfully!', 'success');
+                } else {
+                    Utils.showToast('Invalid data format', 'error');
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                Utils.showToast('Failed to import data', 'error');
+            }
+
+            event.target.value = '';
+        };
+
+        reader.readAsText(file);
+    }
+
+    function refreshDashboard() {
+        renderDashboardStats();
+        renderCharts();
+        renderActivityFeed();
+    }
+
+    // --- REAL-TIME UPDATES SIMULATION ---
+    function startRealTimeUpdates() {
+        // Refresh dashboard every 30 seconds
+        setInterval(() => {
+            refreshDashboard();
+        }, 30000);
+    }
+
     // --- LOGO TOGGLE ---
     let logoInterval;
     function startLogoToggle() { if (logoInterval) clearInterval(logoInterval); DOM.navbarLogoAble.classList.add('active-logo'); DOM.navbarLogoWise.classList.remove('active-logo'); logoInterval = setInterval(() => { const isAble = DOM.navbarLogoAble.classList.contains('active-logo'); DOM.navbarLogoAble.classList.toggle('active-logo', !isAble); DOM.navbarLogoWise.classList.toggle('active-logo', isAble); }, 4000); }
@@ -1686,6 +2252,14 @@
         // General
         switchView('mainView');
         startLogoToggle();
+
+        // Dashboard Analytics
+        renderDashboardStats();
+        renderCharts();
+        renderActivityFeed();
+
+        // Start real-time updates
+        startRealTimeUpdates();
 
         // Periodic auto-save (every 30 seconds as backup)
         setInterval(() => {
